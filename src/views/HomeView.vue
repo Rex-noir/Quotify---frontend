@@ -1,5 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Button from 'primevue/button'
+</script>
 
 <template>
-  <main></main>
+  <main>
+    <Button ripple class="text-red-500">hi</Button>
+  </main>
 </template>
