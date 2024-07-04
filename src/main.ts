@@ -6,7 +6,7 @@ import PrimeVue from 'primevue/config'
 
 import App from './App.vue'
 import router from './router'
-import QuotifyThemePreset from './primevue.preset'
+import QuotifyThemePreset from './config/primevue.preset'
 import Ripple from 'primevue/ripple'
 
 const app = createApp(App)
@@ -15,9 +15,9 @@ app.use(createPinia())
 app.use(router)
 app.directive('ripple', Ripple)
 app.use(PrimeVue, {
+  ripple: true,
   theme: {
     preset: QuotifyThemePreset,
-    ripple: true,
     options: {
       darkModeSelector: '.dark',
       cssLayer: {
