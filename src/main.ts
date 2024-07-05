@@ -9,6 +9,7 @@ import router from './router'
 import QuotifyThemePreset from './config/primevue.preset'
 import Ripple from 'primevue/ripple'
 import boot from './config/boot.config'
+import 'primeicons/primeicons.css'
 
 const app = createApp(App)
 
