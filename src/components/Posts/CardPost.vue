@@ -4,7 +4,7 @@ import Panel from "primevue/panel";
 import Avatar from "primevue/avatar";
 import PostActions from "./PostActionsBar.vue";
 import { ref } from "vue";
-import usePostStore from "@/stores/post.store";
+import usePostStore from "@/stores/posts.store";
 
 defineProps<{ post?: Post }>();
 const postStore = usePostStore();
