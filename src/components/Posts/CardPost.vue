@@ -6,7 +6,7 @@ import PostActions from "./PostActionsBar.vue";
 import { ref } from "vue";
 import usePostStore from "@/stores/posts.store";
 
-defineProps<{ post?: Post }>();
+defineProps<{ post: Post }>();
 const postStore = usePostStore();
 
 let collapsed = ref(false);
@@ -19,7 +19,7 @@ let collapsed = ref(false);
         :class="[
           { 'rounded-xl': postStore.post_style === PostStyles.CARD_ROUND },
         ]"
-        class="border-b border-t p-2 dark:border-surface-800 dark:bg-inherit"
+        class="border-b border-t bg-surface-100 p-2 shadow-lg dark:border-surface-800 dark:bg-inherit"
       >
         <template #toggleicon>
           <span
@@ -61,7 +61,7 @@ let collapsed = ref(false);
               "{{ post?.quote ? post.quote : "This is the quote" }}"
             </span>
             <span class="mr-3 self-end">
-              - {{ post?.author ? post.author : "Author" }}</span
+              - {{ post?.author ? post.author : "Anonymous" }}</span
             >
           </div>
         </div>
