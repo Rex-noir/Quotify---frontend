@@ -5,10 +5,10 @@ import Avatar from "primevue/avatar";
 import PostActions from "./PostActionsBar.vue";
 import { ref } from "vue";
 import usePostStore from "@/stores/posts.store";
+import dayjs from "dayjs";
 
 defineProps<{ post: Post }>();
 const postStore = usePostStore();
-
 let collapsed = ref(false);
 </script>
 <template>
@@ -34,21 +34,26 @@ let collapsed = ref(false);
           ></span>
         </template>
         <template #header>
-          <div class="mb-1 flex h-full items-center">
-            <Avatar label="U" class="mr-2" shape="circle" size="small" />
-            <div class="flex items-center justify-center gap-3">
-              <span class="prose prose-xl dark:prose-invert"
-                >@{{ post?.username ? post.username : "username" }}</span
-              >
-              <span class="prose prose-sm dark:prose-invert">{{
-                post?.timestamp ? post.timestamp : "1 second ago"
-              }}</span>
+          <div>
+            <div class="mb-1 flex h-full items-center">
+              <Avatar label="U" class="mr-2" shape="circle" size="small" />
+              <div class="flex flex-col">
+                <span
+                  class="prose prose-xl font-semibold leading-none dark:prose-invert"
+                  >@{{ post?.user.name ? post.user.name : "username" }}</span
+                >
+                <span class="prose prose-sm dark:prose-invert">{{
+                  post?.created_at
+                    ? dayjs(post.created_at).format("DD-MM-YYYY h:mm a")
+                    : "1 second ago"
+                }}</span>
+              </div>
             </div>
           </div>
         </template>
 
         <template #footer>
-          <PostActions></PostActions>
+          <PostActions :post="post"></PostActions>
         </template>
 
         <div class="mt-1 flex flex-col gap-5">
@@ -83,6 +88,5 @@ let collapsed = ref(false);
 }
 .p-panel-footer {
   padding: 0px;
-  margin-top: 2rem;
 }
 </style>
