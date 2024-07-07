@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { PostBarActions, type Post } from "@/types/Post/post.types";
-import Button from "primevue/button";
-
+import { type Post } from "@/types/Post/post.types";
 defineProps<{
   post?: Post;
 }>();
@@ -10,16 +8,16 @@ defineProps<{
   <div
     class="grid w-full grid-cols-4 place-items-center gap-2 border-t dark:border-slate-800"
   >
-    <div class="action-container">
-      <span>{{ post?.comments ? post?.comments : "0" }}</span>
+    <div v-ripple class="action-container">
+      <span>{{ post?.likes_count ? post?.likes_count : "0" }}</span>
       <span class="pi pi-thumbs-up" aria-label="Filter" />
     </div>
     <div v-ripple class="action-container">
-      <span>{{ post?.comments ? post?.comments : "0" }}</span>
+      <span>{{ post?.dislikes_count ? post?.dislikes_count : "0" }}</span>
       <span class="pi pi-thumbs-down" aria-label="Filter" />
     </div>
     <div v-ripple class="action-container">
-      <span>{{ post?.comments ? post?.comments : "0" }}</span>
+      <span>{{ post?.comments_count ? post?.comments_count : "0" }}</span>
       <span class="pi pi-comment" aria-label="Filter" />
     </div>
     <div v-ripple class="action-container">
