@@ -6,25 +6,40 @@ import Button from "primevue/button";
 const { currentView } = useHomeViews();
 </script>
 <template>
-  <div class="grid grid-cols-3 p-1">
-    <Button class="tab-buttons" type="button" label="Communities" outlined />
-    <Button
-      class="tab-buttons"
-      :class="[
-        { 'active-tab': currentView === HomeViews[HomeViewsEnum.POSTS] },
-      ]"
-      type="button"
-      label="Feed"
-      outlined
-    />
-    <Button class="tab-buttons" type="button" label="Groups" outlined />
+  <div class="grid w-full p-1 md:place-items-center lg:grid-cols-3">
+    <div class="col-span-2 grid w-full grid-cols-3 place-items-center gap-2">
+      <Button
+        outlined
+        :class="[
+          { 'active-tab': currentView === HomeViews[HomeViewsEnum.POSTS] },
+        ]"
+        icon="pi pi-home"
+        class="tab-buttons"
+        size="medium"
+        iconPos="top"
+      />
+      <Button
+        outlined
+        class="tab-buttons"
+        icon="pi pi-users"
+        size="medium"
+        iconPos="top"
+      />
+      <Button
+        outlined
+        icon="pi pi-globe"
+        size="medium"
+        class="tab-buttons"
+        iconPos="top"
+      />
+    </div>
   </div>
 </template>
 <style scoped>
 .tab-buttons {
-  @apply rounded-none border-none;
+  @apply w-full rounded-xl border-none hover:text-slate-600;
 }
 .active-tab {
-  @apply bg-surface-300;
+  @apply bg-surface-200;
 }
 </style>
