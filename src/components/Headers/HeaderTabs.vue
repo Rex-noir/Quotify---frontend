@@ -6,7 +6,7 @@ import Button from "primevue/button";
 const { currentView } = useHomeViews();
 </script>
 <template>
-  <div class="grid w-full p-1 md:place-items-center lg:grid-cols-3">
+  <div class="w-full p-1">
     <div class="col-span-2 grid w-full grid-cols-3 place-items-center gap-2">
       <Button
         outlined
