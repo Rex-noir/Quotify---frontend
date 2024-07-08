@@ -15,10 +15,10 @@ const userStore = useUserStore();
     <HeaderSmall class="fixed z-50 w-full bg-surface-100 lg:hidden" />
     <HeaderLarge class="fixed z-50 hidden w-full bg-surface-100 lg:grid" />
     <div
-      class="relative top-[6.5rem] grid h-full gap-1 md:grid-cols-3 lg:top-14 lg:grid-cols-4"
+      class="relative top-[6.5rem] grid h-full gap-1 md:grid-cols-3 lg:top-14 lg:grid-cols-[250px,1fr,1fr,1fr]"
     >
       <div
-        class="hidden h-screen border-r border-r-surface-300 lg:fixed lg:col-start-1 lg:block lg:w-80 lg:max-w-none"
+        class="hidden h-screen border-r border-r-surface-300 lg:fixed lg:col-start-1 lg:block lg:w-80 lg:max-w-[250px]"
       >
         <component v-if="userStore.status" :is="SideLoggedIn" />
         <component v-else :is="SideNotLoggedIn" />
