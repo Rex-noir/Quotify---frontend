@@ -4,11 +4,12 @@ import DataView from "primevue/dataview";
 import { onMounted, ref } from "vue";
 import CardPost from "@/components/Posts/CardPost.vue";
 import PostUtils from "@/utils/post.utils";
+import CardPostSkeleton from "@/components/Posts/CardPostSkeleton.vue";
 
 const posts = ref<Post[]>();
 onMounted(async () => {
   try {
-    const response = await PostUtils.fetchPostLists();
+    const response = await PostUtils.fetchPosts();
     posts.value = response.data;
   } catch (error) {
     throw error;
@@ -19,9 +20,9 @@ onMounted(async () => {
 <template>
   <main class="grid-cols-5">
     <DataView class="md:col-span-3" :value="posts">
-      <template #empty
-        ><div class="h-full w-full text-center">No data to show!</div></template
-      >
+      <template #empty>
+        <CardPostSkeleton v-for="(items, index) in [1, 2, 3, 4, 5, 6, 7]" />
+      </template>
       <template #list="slotProp">
         <CardPost
           v-for="(post, index) in slotProp.items"
