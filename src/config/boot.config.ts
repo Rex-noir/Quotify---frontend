@@ -1,14 +1,37 @@
-import axios from 'axios'
+import useUserStore from "@/stores/user.store";
+import api from "./api.config";
+import { csrf } from "@/utils/auth.utils";
 
-function boot() {
-  csrfToken()
+async function boot() {
+  await csrf();
+  await authCheck();
 }
-export default boot
+export default boot;
 
-async function csrfToken() {
+export async function authCheck() {
+  const userStore = useUserStore();
   try {
-    await axios.get(import.meta.env.VITE_CSRF_SANCTUM)
+    const response = await api.post("/auth/verify");
+    if (response.status === 206) {
+      userStore.logOut();
+    } else if (response.status === 200) {
+      retrieveUser();
+    }
   } catch (error) {
-    throw error
+    userStore.logOut();
+    throw error;
+  }
+}
+
+async function retrieveUser() {
+  try {
+    const response = await api.get("/user");
+    if (response.status !== 200) {
+      throw new Error(response.statusText);
+    }
+    useUserStore().logIn(response.data);
+    console.log(response.data);
+  } catch (error) {
+    throw error;
   }
 }
