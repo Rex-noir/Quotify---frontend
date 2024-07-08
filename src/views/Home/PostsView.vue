@@ -18,7 +18,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="grid-cols-5">
+  <main class="">
     <DataView class="md:col-span-3" :value="posts">
       <template #empty>
         <CardPostSkeleton v-for="(items, index) in [1, 2, 3, 4, 5, 6, 7]" />
