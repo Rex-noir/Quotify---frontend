@@ -1,4 +1,3 @@
-import HomeLayout from "@/Layouts/HomeLayout.vue";
 import { LayoutNames, layouts } from "@/types/Layouts/layouts.types";
 import { defineStore } from "pinia";
 import { shallowRef, type DefineComponent } from "vue";
