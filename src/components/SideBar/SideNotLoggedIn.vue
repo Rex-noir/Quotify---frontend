@@ -6,75 +6,96 @@ import Button from "primevue/button";
 import Password from "primevue/password";
 import Divider from "primevue/divider";
 import { ref } from "vue";
+import AuthUtils from "@/utils/auth.utils";
+import { useRouter } from "vue-router";
+import Message from "primevue/message";
+import { isAxiosError } from "axios";
 
-const password = ref();
+const login = ref<{
+  email: string;
+  password: string;
+}>({
+  email: "",
+  password: "",
+});
+
+const theRouter = useRouter();
+const errorMessage = ref<string>();
+const loginLoading = ref<boolean>(false);
+const handleLogin = async () => {
+  try {
+    loginLoading.value = true;
+    await AuthUtils.login(login.value.email, login.value.password);
+    loginLoading.value = false;
+    
+  } catch (error) {
+    if (isAxiosError(error)) {
+      errorMessage.value = error.response?.data.message;
+    }
+    loginLoading.value = false;
+  }
+};
 </script>
 <template>
-  <div class="p-5">
-    <div class="title-styles flex flex-col">
-      <div class="flex flex-col gap-2">
-        <h1 class="mb-0 p-0">Login</h1>
-        <InputGroup>
-          <InputGroupAddon>
-            <i class="pi pi-user"></i>
-          </InputGroupAddon>
-          <InputText class="border-surface-300" placeholder="Username" />
-        </InputGroup>
-        <InputGroup>
-          <InputGroupAddon>
-            <i class="pi pi-key"></i>
-          </InputGroupAddon>
-          <Password
-            toggle-mask
-            placeholder="Password"
-            v-model="password"
-            :feedback="false"
+  <div class="h-full bg-surface-100 p-3">
+    <div class="title-styles mt-10 flex w-full flex-col justify-center">
+      <form @submit.prevent="handleLogin">
+        <div class="flex flex-col justify-center gap-2">
+          <h1 class="mb-0 p-0">Login</h1>
+          <Message
+            :severity="errorMessage ? 'error' : 'secondary'"
+            class="text-center"
+          >
+            {{ errorMessage || '"Welcome back, mate!" - Some Guy' }}
+          </Message>
+          <InputGroup>
+            <InputGroupAddon>
+              <i class="pi pi-user"></i>
+            </InputGroupAddon>
+            <InputText
+              class="border-surface-300"
+              autocomplete="email"
+              placeholder="Email"
+              name="email"
+              type="email"
+              v-model="login.email"
+            />
+          </InputGroup>
+          <InputGroup>
+            <InputGroupAddon>
+              <i class="pi pi-key"></i>
+            </InputGroupAddon>
+            <Password
+              toggle-mask
+              name="password"
+              :input-props="{ autocomplete: true }"
+              placeholder="Password"
+              v-model="login.password"
+              :feedback="false"
+            />
+          </InputGroup>
+          <Button
+            :loading="loginLoading"
+            severity="info"
+            outlined
+            type="submit"
+            size="small"
+            class="mx-auto w-full"
+            label="Login"
           />
-        </InputGroup>
-        <Button
-          severity="info"
-          outlined
-          size="small"
-          class="mx-auto w-fit"
-          label="Login"
-        />
-      </div>
+        </div>
+      </form>
       <Divider align="center" type="solid">
         <b class="prose">Or</b>
       </Divider>
-      <div class="flex flex-col gap-2 p-2">
-        <h1 class="mb-0 p-0">Sign Up</h1>
-        <InputGroup>
-          <InputGroupAddon>
-            <i class="pi pi-user"></i>
-          </InputGroupAddon>
-          <InputText class="border-surface-300" placeholder="Username" />
-        </InputGroup>
-        <InputGroup>
-          <InputGroupAddon>
-            <i class="pi pi-at"></i>
-          </InputGroupAddon>
-          <InputText class="border-surface-300" placeholder="Email" />
-        </InputGroup>
-        <InputGroup>
-          <InputGroupAddon>
-            <i class="pi pi-key"></i>
-          </InputGroupAddon>
-          <Password
-            toggle-mask
-            placeholder="Password"
-            v-model="password"
-            :feedback="false"
-          />
-        </InputGroup>
-        <Button
-          severity="success"
-          outlined
-          size="small"
-          class="mx-auto w-fit"
-          label="Sign Up"
-        />
-      </div>
+      <Button
+        severity="success "
+        outlined
+        size="small"
+        @click="theRouter.push({ name: 'signup' })"
+        class="mx-auto w-full"
+        label="Sign Up"
+      />
     </div>
   </div>
 </template>
@@ -87,5 +108,8 @@ const password = ref();
 }
 .title-styles {
   @apply prose prose-h1:prose-2xl prose-h1:m-0 prose-h1:text-center; /*titles*/
+}
+.p-message-content {
+  @apply justify-center p-0 px-1;
 }
 </style>
