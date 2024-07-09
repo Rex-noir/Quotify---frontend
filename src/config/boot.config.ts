@@ -4,7 +4,6 @@ import { csrf } from "@/utils/auth.utils";
 
 async function boot() {
   await csrf();
-  await authCheck();
 }
 export default boot;
 
@@ -15,8 +14,9 @@ export async function authCheck() {
     if (response.status === 206) {
       userStore.logOut();
     } else if (response.status === 200) {
-      retrieveUser();
+      await retrieveUser();
     }
+    return response;
   } catch (error) {
     userStore.logOut();
     throw error;
@@ -31,6 +31,7 @@ async function retrieveUser() {
     }
     useUserStore().logIn(response.data);
     console.log(response.data);
+    return response;
   } catch (error) {
     throw error;
   }
