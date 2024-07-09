@@ -27,7 +27,7 @@ const handleLogin = async () => {
     loginLoading.value = true;
     await AuthUtils.login(login.value.email, login.value.password);
     loginLoading.value = false;
-    
+    location.reload();
   } catch (error) {
     if (isAxiosError(error)) {
       errorMessage.value = error.response?.data.message;
@@ -46,7 +46,7 @@ const handleLogin = async () => {
             :severity="errorMessage ? 'error' : 'secondary'"
             class="text-center"
           >
-            {{ errorMessage || '"Welcome back, mate!" - Some Guy' }}
+            {{ errorMessage || '"Welcome back, mate!" - Anon' }}
           </Message>
           <InputGroup>
             <InputGroupAddon>

@@ -14,5 +14,4 @@ watch(userStore, (newUserStore) => {
 </script>
 <template>
   <SplashView></SplashView>
-  <router-view v-if="!userStore.loading" />
 </template>
