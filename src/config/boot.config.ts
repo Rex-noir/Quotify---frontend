@@ -30,7 +30,6 @@ async function retrieveUser() {
       throw new Error(response.statusText);
     }
     useUserStore().logIn(response.data);
-    console.log(response.data);
     return response;
   } catch (error) {
     throw error;
