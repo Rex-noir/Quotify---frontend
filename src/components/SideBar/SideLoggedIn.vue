@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const options = ref<{ label: string; icon: string }[]>([
   { label: "Profile", icon: "pi pi-user" },
@@ -9,12 +9,13 @@ const options = ref<{ label: string; icon: string }[]>([
   { label: "Setting", icon: "pi pi-cog" },
 ]);
 
-const isDark = computed(() =>
+const isDark = ref<boolean>(
   document.documentElement.classList.contains("dark"),
 );
 
 const toggleDarkMode = () => {
   document.documentElement.classList.toggle("dark");
+  isDark.value = !isDark.value;
 };
 </script>
 <template>
