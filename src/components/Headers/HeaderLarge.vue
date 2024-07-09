@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import HeaderTabs from "./HeaderTabs.vue";
 import InputText from "primevue/inputtext";
-import Button from "primevue/button";
 import InputIcon from "primevue/inputicon";
 import IconField from "primevue/iconfield";
 
