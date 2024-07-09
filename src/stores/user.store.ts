@@ -9,6 +9,7 @@ const useUserStore = defineStore("user", () => {
 
   function logOut() {
     status.value = false;
+    userInfo.value = null; // Clear user info on logout
     loading.value = false;
   }
 
