@@ -18,18 +18,18 @@ const signUp = ref<{
 </script>
 <template>
   <div
-    class="prose flex h-full max-w-none flex-col items-center justify-start gap-10 p-3 dark:prose-invert"
+    class="prose flex h-full max-w-none flex-col items-center justify-center gap-10 p-3 dark:prose-invert md:dark:bg-[#131313]"
   >
-    <div class="md:w-[50%]">
-      <h3 class="text-center">SIGN UP</h3>
+    <div class="prose dark:prose-invert md:w-[70%]">
+      <h3 class="text-center text-4xl">SIGN UP</h3>
       <form @submit.prevent="">
         <div class="flex flex-col gap-2">
           <InputGroup>
-            <InputGroupAddon>
+            <InputGroupAddon class="border-none">
               <i class="pi pi-user"></i>
             </InputGroupAddon>
             <InputText
-              class="border-surface-300"
+              class="prose border-none border-surface-300 dark:prose-invert"
               autocomplete="email"
               placeholder="Username"
               name="username"
@@ -38,11 +38,11 @@ const signUp = ref<{
             />
           </InputGroup>
           <InputGroup>
-            <InputGroupAddon>
+            <InputGroupAddon class="border-none">
               <i class="pi pi-at"></i>
             </InputGroupAddon>
             <InputText
-              class="border-surface-300"
+              class="prose border-none border-surface-300 dark:prose-invert"
               autocomplete="email"
               placeholder="Email"
               name="email"
@@ -51,13 +51,16 @@ const signUp = ref<{
             />
           </InputGroup>
           <InputGroup>
-            <InputGroupAddon>
+            <InputGroupAddon class="border-none">
               <i class="pi pi-key"></i>
             </InputGroupAddon>
             <Password
               toggle-mask
               name="password"
-              :input-props="{ autocomplete: true }"
+              :input-props="{
+                autocomplete: true,
+                class: 'border-none prose dark:prose-invert',
+              }"
               placeholder="Password"
               v-model="signUp.password"
               :feedback="false"

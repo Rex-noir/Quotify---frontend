@@ -1,8 +1,10 @@
 import useUserStore from "@/stores/user.store";
 import api from "./api.config";
 import { csrf } from "@/utils/auth.utils";
+import usePrefStore from "@/stores/preferences.store";
 
 async function boot() {
+  usePrefStore().loadUserPref();
   await csrf();
 }
 export default boot;

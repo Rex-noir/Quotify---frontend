@@ -19,7 +19,7 @@ let collapsed = ref(false);
         :class="[
           { 'rounded-xl': postStore.post_style === PostStyles.CARD_ROUND },
         ]"
-        class="border-b border-t bg-surface-100 p-2 shadow-lg dark:border-surface-800 dark:bg-inherit"
+        class="border-none shadow-md dark:bg-[#272626]"
       >
         <template #toggleicon>
           <span
@@ -35,7 +35,9 @@ let collapsed = ref(false);
         </template>
         <template #header>
           <div>
-            <div class="mb-1 flex h-full items-center">
+            <div
+              class="prose mb-1 flex h-full items-center p-2 dark:prose-invert"
+            >
               <Avatar label="U" class="mr-2" shape="circle" size="small" />
               <div class="flex flex-col">
                 <span
@@ -56,12 +58,16 @@ let collapsed = ref(false);
           <PostActions :post="post"></PostActions>
         </template>
 
-        <div class="mt-1 flex flex-col gap-5">
+        <div
+          class="mt- prose flex max-w-none flex-col gap-5 p-2 dark:prose-invert"
+        >
           <span class="text-xl font-semibold leading-tight">
             {{ post?.title ? post?.title : "Title" }}
           </span>
 
-          <div class="mt-2 flex flex-col gap-6 text-center leading-normal">
+          <div
+            class="place-items-center text-xl prose mt-2 grid grid-rows-[5fr,1fr] max-w-none dark:prose-invert gap-6 text-center leading-normal md:grid-rows-[7fr,1fr]"
+          >
             <span class="font-medium">
               "{{ post?.quote ? post.quote : "This is the quote" }}"
             </span>

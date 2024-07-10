@@ -12,13 +12,17 @@ const userStore = useUserStore();
 </script>
 <template>
   <div class="relative h-full">
-    <HeaderSmall class="fixed z-50 w-full bg-surface-100 lg:hidden" />
-    <HeaderLarge class="fixed z-50 hidden w-full bg-surface-100 lg:grid" />
+    <HeaderSmall
+      class="fixed z-50 w-full bg-surface-100 dark:bg-surface-0 lg:hidden"
+    />
+    <HeaderLarge
+      class="fixed z-50 hidden w-full bg-surface-100 dark:bg-surface-0 lg:grid"
+    />
     <div
-      class="relative top-[6.5rem] grid h-full gap-1 md:grid-cols-3 lg:top-14 lg:grid-cols-[250px,1fr,1fr,1fr]"
+      class="relative top-[6.5rem] grid h-full gap-1 md:top-[4rem] md:grid-cols-3 lg:top-14 lg:grid-cols-[250px,1fr,1fr,1fr]"
     >
       <div
-        class="hidden h-screen border-r border-r-surface-300 lg:fixed lg:col-start-1 lg:block lg:w-80 lg:max-w-[250px]"
+        class="hidden h-screen border-r dark:border-r-neutral-800 lg:fixed lg:col-start-1 lg:block lg:w-80 lg:max-w-[250px]"
       >
         <component v-if="userStore.status" :is="SideLoggedIn" />
         <component v-else :is="SideNotLoggedIn" />

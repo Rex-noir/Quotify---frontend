@@ -19,16 +19,23 @@ onMounted(async () => {
 
 <template>
   <main class="">
-    <DataView class="md:col-span-3" :value="posts">
+    <DataView :value="posts">
       <template #empty>
         <CardPostSkeleton v-for="(items, index) in [1, 2, 3, 4, 5, 6, 7]" />
       </template>
       <template #list="slotProp">
-        <CardPost
-          v-for="(post, index) in slotProp.items"
-          :post="post as Post"
-        ></CardPost>
+        <div class="flex flex-col gap-2">
+          <CardPost
+            v-for="(post, index) in slotProp.items"
+            :post="post as Post"
+          ></CardPost>
+        </div>
       </template>
     </DataView>
   </main>
 </template>
+<style>
+.p-dataview-content {
+  @apply dark:bg-surface-0;
+}
+</style>

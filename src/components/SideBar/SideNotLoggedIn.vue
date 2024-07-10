@@ -37,10 +37,10 @@ const handleLogin = async () => {
 };
 </script>
 <template>
-  <div class="h-full bg-surface-100 p-3">
+  <div class="h-full bg-surface-100 p-3 dark:bg-surface-0">
     <div class="title-styles mt-10 flex w-full flex-col justify-center">
       <form @submit.prevent="handleLogin">
-        <div class="flex flex-col justify-center gap-2">
+        <div class="prose flex flex-col justify-center gap-2 dark:prose-invert">
           <h1 class="mb-0 p-0">Login</h1>
           <Message
             :severity="errorMessage ? 'error' : 'secondary'"
@@ -49,11 +49,11 @@ const handleLogin = async () => {
             {{ errorMessage || '"Welcome back, mate!" - Anon' }}
           </Message>
           <InputGroup>
-            <InputGroupAddon>
+            <InputGroupAddon class="border-none">
               <i class="pi pi-user"></i>
             </InputGroupAddon>
             <InputText
-              class="border-surface-300"
+              class="prose border-none dark:prose-invert"
               autocomplete="email"
               placeholder="Email"
               name="email"
@@ -62,13 +62,16 @@ const handleLogin = async () => {
             />
           </InputGroup>
           <InputGroup>
-            <InputGroupAddon>
+            <InputGroupAddon class="border-none">
               <i class="pi pi-key"></i>
             </InputGroupAddon>
             <Password
               toggle-mask
               name="password"
-              :input-props="{ autocomplete: true }"
+              :input-props="{
+                autocomplete: true,
+                class: 'border-none prose dark:prose-invert',
+              }"
               placeholder="Password"
               v-model="login.password"
               :feedback="false"
@@ -86,7 +89,7 @@ const handleLogin = async () => {
         </div>
       </form>
       <Divider align="center" type="solid">
-        <b class="prose">Or</b>
+        <span class="dark:text-white">Or</span>
       </Divider>
       <Button
         severity="success "
