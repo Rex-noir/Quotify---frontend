@@ -13,28 +13,35 @@ const options = ref<{ label: string; icon: string }[]>([
 const prefStore = usePrefStore();
 </script>
 <template>
-  <div class="flex flex-col border-b p-2 dark:border-surface-800">
-    <div v-ripple v-for="(item, index) in options" :key="index" class="btn-div">
-      <span
-        :class="item.icon"
-        class="w-fit rounded-full border border-surface-300 p-2 text-center"
-      ></span>
-      <span class="font-display">{{ item.label }}</span>
+  <div>
+    <div class="flex h-full flex-col border-b p-2 dark:bg-surface-0">
+      <div
+        v-ripple
+        v-for="(item, index) in options"
+        :key="index"
+        class="btn-div"
+      >
+        <span
+          :class="item.icon"
+          class="w-fit rounded-full border border-surface-300 p-2 text-center"
+        ></span>
+        <span class="font-display">{{ item.label }}</span>
+      </div>
     </div>
-  </div>
-  <div class="p-2">
-    <div v-ripple @click="prefStore.toggleDarkMode" class="btn-div">
-      <span
-        :class="prefStore.isDark ? 'pi-lightbulb' : 'pi-moon'"
-        class="pi w-fit rounded-full border border-surface-300 p-2 text-center"
-      ></span>
-      <span>{{ prefStore.isDark ? "Light Mode" : "Dark Mode" }}</span>
-    </div>
-    <div v-ripple class="btn-div">
-      <span
-        class="pi pi-sign-out w-fit rounded-full border border-surface-300 p-2 text-center"
-      ></span>
-      <span>Logout</span>
+    <div class="p-2">
+      <div v-ripple @click="prefStore.toggleDarkMode" class="btn-div">
+        <span
+          :class="prefStore.isDark ? 'pi-lightbulb' : 'pi-moon'"
+          class="pi w-fit rounded-full border border-surface-300 p-2 text-center"
+        ></span>
+        <span>{{ prefStore.isDark ? "Light Mode" : "Dark Mode" }}</span>
+      </div>
+      <div v-ripple class="btn-div">
+        <span
+          class="pi pi-sign-out w-fit rounded-full border border-surface-300 p-2 text-center"
+        ></span>
+        <span>Logout</span>
+      </div>
     </div>
   </div>
 </template>
