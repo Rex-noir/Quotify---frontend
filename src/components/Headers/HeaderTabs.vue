@@ -35,7 +35,7 @@ const { currentView } = useHomeViews();
 </template>
 <style scoped>
 .tab-buttons {
-  @apply w-full rounded-md border-none;
+  @apply w-full rounded-none border-none;
 }
 .active-tab {
   @apply prose bg-surface-200 dark:prose-invert dark:bg-highlight;

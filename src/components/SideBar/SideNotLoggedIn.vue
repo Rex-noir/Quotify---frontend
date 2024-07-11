@@ -37,56 +37,56 @@ const handleLogin = async () => {
 };
 </script>
 <template>
-  <div class="h-full bg-surface-100 p-3 dark:bg-surface-0">
-    <div class="title-styles mt-10 flex w-full flex-col justify-center">
-      <form @submit.prevent="handleLogin">
-        <div class="prose flex flex-col justify-center gap-2 dark:prose-invert">
-          <h1 class="mb-0 p-0">Login</h1>
-          <Message
-            :severity="errorMessage ? 'error' : 'secondary'"
-            class="text-center"
-          >
-            {{ errorMessage || '"Welcome back, mate!" - Anon' }}
-          </Message>
-          <InputGroup>
-            <InputGroupAddon class="border-none">
-              <i class="pi pi-user"></i>
-            </InputGroupAddon>
-            <InputText
-              class="prose border-none dark:prose-invert"
-              autocomplete="email"
-              placeholder="Email"
-              name="email"
-              type="email"
-              v-model="login.email"
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputGroupAddon class="border-none">
-              <i class="pi pi-key"></i>
-            </InputGroupAddon>
-            <Password
-              toggle-mask
-              name="password"
-              :input-props="{
-                autocomplete: true,
-                class: 'border-none prose dark:prose-invert',
-              }"
-              placeholder="Password"
-              v-model="login.password"
-              :feedback="false"
-            />
-          </InputGroup>
-          <Button
-            :loading="loginLoading"
-            severity="info"
-            outlined
-            type="submit"
-            size="small"
-            class="mx-auto w-full"
-            label="Login"
+  <div class="h-full w-full bg-surface-100 p-3 dark:bg-surface-0">
+    <div
+      class="title-styles prose flex w-full flex-col items-center justify-center dark:prose-invert"
+    >
+      <form @submit.prevent="handleLogin" class="flex flex-col gap-3">
+        <h1 class="mb-0 p-0">Login</h1>
+        <Message
+          :severity="errorMessage ? 'error' : 'secondary'"
+          class="text-center"
+        >
+          {{ errorMessage || '"Welcome back, mate!" - Anon' }}
+        </Message>
+        <InputGroup>
+          <InputGroupAddon class="border-none">
+            <i class="pi pi-user"></i>
+          </InputGroupAddon>
+          <InputText
+            class="prose border-none dark:prose-invert"
+            autocomplete="email"
+            placeholder="Email"
+            name="email"
+            type="email"
+            v-model="login.email"
           />
-        </div>
+        </InputGroup>
+        <InputGroup>
+          <InputGroupAddon class="border-none">
+            <i class="pi pi-key"></i>
+          </InputGroupAddon>
+          <Password
+            toggle-mask
+            name="password"
+            :input-props="{
+              autocomplete: true,
+              class: 'border-none prose dark:prose-invert',
+            }"
+            placeholder="Password"
+            v-model="login.password"
+            :feedback="false"
+          />
+        </InputGroup>
+        <Button
+          :loading="loginLoading"
+          severity="info"
+          outlined
+          type="submit"
+          size="small"
+          class="mx-auto w-full"
+          label="Login"
+        />
       </form>
       <Divider align="center" type="solid">
         <span class="dark:text-white">Or</span>

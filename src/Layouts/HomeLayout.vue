@@ -19,16 +19,16 @@ const userStore = useUserStore();
       class="fixed z-50 hidden w-full bg-surface-100 dark:bg-surface-0 lg:grid"
     />
     <div
-      class="relative top-[6.5rem] grid h-full md:top-[4rem] md:grid-cols-3 lg:top-14 lg:grid-cols-[250px,1fr,1fr,1fr]"
+      class="relative top-[6.5rem] grid h-full gap-2 md:top-[4rem] md:grid-cols-3 lg:top-14 lg:grid-cols-[250px,1fr,1fr,1fr]"
     >
       <div
-        class="hidden h-screen border-r dark:border-r-neutral-800 lg:fixed lg:col-start-1 lg:block lg:w-80 lg:max-w-[250px]"
+        class="hidden h-screen lg:fixed lg:col-start-1 lg:block lg:w-80 lg:max-w-[250px]"
       >
         <component v-if="userStore.status" :is="SideLoggedIn" />
         <component v-else :is="SideNotLoggedIn" />
       </div>
       <component
-        class="md:col-span-2 lg:col-span-2 lg:col-start-2"
+        class="border-l border-r dark:border-surface-700 md:col-span-2 lg:col-span-2 lg:col-start-2"
         :is="currentView"
       />
       <component
