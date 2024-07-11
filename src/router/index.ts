@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { LayoutNames } from "@/types/Layouts/layouts.types";
-import PostViews from "@/views/Home/PostsView.vue";
-import SignUpView from "@/views/Auth/SignUpView.vue";
+import PostListView from "@/views/Home/PostListView.vue";
 import SplashView from "@/views/Splash/SplashView.vue";
 import useUserStore from "@/stores/user.store";
+import useRouteStore from "@/stores/route.store";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,25 +17,39 @@ const router = createRouter({
     {
       path: "/home",
       name: "home",
-      component: PostViews,
+      component: PostListView,
       meta: { layout: LayoutNames.HOME },
     },
     {
       path: "/signup",
       name: "signup",
-      component: SignUpView,
+      component: () => import("@/views/Auth/SignUpView.vue"),
       meta: { layout: LayoutNames.AUTH },
     },
+
   ],
 });
 
 //Router Guards
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
-  if (to.name !== "quotify" && userStore.loading) {
-    next({ name: "quotify" });
+  const routeStore = useRouteStore();
+
+  if (userStore.loading) {
+    if (to.name !== "quotify") {
+      routeStore.setIntendedRoute(to);
+      next({ name: "quotify", replace: true });
+    } else {
+      next();
+    }
   } else {
-    next();
+    const intendedRoute = routeStore.intendedRoute;
+    if (to.name === "quotify" && intendedRoute) {
+      routeStore.setIntendedRoute(null);
+      next(intendedRoute);
+    } else {
+      next();
+    }
   }
 });
 
