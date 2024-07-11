@@ -54,7 +54,7 @@ let collapsed = ref(false);
 
           <div class="mt-2 flex flex-col gap-6 text-center leading-normal">
             <div
-              class="flex flex-col items-center justify-center gap-1 self-center"
+              class="grid grid-rows-[5fr,1fr] place-items-center gap-1 md:grid-rows-[7fr,1fr]"
             >
               <Skeleton width="15rem"> </Skeleton>
               <Skeleton width="10rem"> </Skeleton>
