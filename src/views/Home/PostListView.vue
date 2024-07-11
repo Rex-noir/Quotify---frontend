@@ -5,12 +5,13 @@ import { onMounted, ref } from "vue";
 import CardPost from "@/components/Posts/CardPost.vue";
 import PostUtils from "@/utils/post.utils";
 import CardPostSkeleton from "@/components/Posts/CardPostSkeleton.vue";
+import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
 
-const posts = ref<Post[]>();
+const posts = ref<PaginatedResponse<Post[]>>();
 onMounted(async () => {
   try {
     const response = await PostUtils.fetchPosts();
-    posts.value = response.data;
+    posts.value = response as PaginatedResponse<Post[]>;
   } catch (error) {
     throw error;
   }
@@ -19,7 +20,7 @@ onMounted(async () => {
 
 <template>
   <main class="">
-    <DataView :value="posts">
+    <DataView :value="posts?.data">
       <template #empty>
         <CardPostSkeleton v-for="(items, index) in [1, 2, 3, 4, 5, 6, 7]" />
       </template>
@@ -28,6 +29,7 @@ onMounted(async () => {
           <CardPost
             v-for="(post, index) in slotProp.items"
             :post="post as Post"
+            :key="post.id"
           ></CardPost>
         </div>
       </template>
@@ -36,6 +38,6 @@ onMounted(async () => {
 </template>
 <style>
 .p-dataview-content {
-  @apply dark:bg-surface-0;
+  @apply bg-surface-100 dark:bg-surface-0;
 }
 </style>
