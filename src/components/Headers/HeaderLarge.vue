@@ -8,14 +8,14 @@ import IconField from "primevue/iconfield";
 const searchFocus = ref<boolean>(false);
 </script>
 <template>
-  <div class="grid-cols-[250px,2fr,1fr] items-center border-none p-1">
+  <div class="grid-cols-[250px,2fr,1fr] items-center border-none">
     <span class="text-center font-display text-2xl font-bold dark:text-teal-300"
       >Quotify</span
     >
     <div class="col-start-2">
       <HeaderTabs />
     </div>
-    <div class="prose relative px-3 col-start-3 dark:prose-invert">
+    <div class="prose relative col-start-3 dark:prose-invert">
       <IconField>
         <InputIcon
           v-show="searchFocus"
