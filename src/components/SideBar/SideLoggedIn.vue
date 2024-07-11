@@ -13,33 +13,26 @@ const options = ref<{ label: string; icon: string }[]>([
 const prefStore = usePrefStore();
 </script>
 <template>
-  <div>
-    <div class="flex h-full flex-col border-b p-2 dark:bg-surface-0">
+  <div class="h-full bg-surface-100 dark:bg-surface-0">
+    <div class="flex flex-col p-2">
       <div
         v-ripple
         v-for="(item, index) in options"
         :key="index"
         class="btn-div"
       >
-        <span
-          :class="item.icon"
-          class="w-fit rounded-full border border-surface-300 p-2 text-center"
-        ></span>
+        <span :class="item.icon" class="icon-div"></span>
         <span class="font-display">{{ item.label }}</span>
       </div>
-    </div>
-    <div class="p-2">
       <div v-ripple @click="prefStore.toggleDarkMode" class="btn-div">
         <span
           :class="prefStore.isDark ? 'pi-lightbulb' : 'pi-moon'"
-          class="pi w-fit rounded-full border border-surface-300 p-2 text-center"
+          class="icon-div pi pi-moon"
         ></span>
         <span>{{ prefStore.isDark ? "Light Mode" : "Dark Mode" }}</span>
       </div>
       <div v-ripple class="btn-div">
-        <span
-          class="pi pi-sign-out w-fit rounded-full border border-surface-300 p-2 text-center"
-        ></span>
+        <span class="icon-div pi pi-sign-out"></span>
         <span>Logout</span>
       </div>
     </div>
@@ -48,5 +41,8 @@ const prefStore = usePrefStore();
 <style scoped>
 .btn-div {
   @apply grid w-full cursor-pointer grid-cols-[30px,1fr] items-center gap-2 rounded-lg p-3 hover:bg-surface-100 dark:hover:bg-highlight-emphasis;
+}
+.icon-div {
+  @apply w-fit rounded-full border border-primary-emphasis p-2 text-center;
 }
 </style>
