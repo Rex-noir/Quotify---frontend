@@ -12,5 +12,9 @@ router.afterEach((to) => {
 
 <template>
   <Toast position="bottom-center" />
-  <component :is="layoutStore.currentLayout" />
+  <router-view v-slot="{ Component, route }">
+    <keep-alive include="HomeLayout">
+      <component :is="layoutStore.currentLayout" />
+    </keep-alive>
+  </router-view>
 </template>
