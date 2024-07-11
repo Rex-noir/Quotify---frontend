@@ -1,4 +1,4 @@
-import PostsView from "@/views/Home/PostsView.vue";
+import PostListView from "@/views/Home/PostListView.vue";
 import type { DefineComponent } from "vue";
 
 export enum HomeViewsEnum {
@@ -6,5 +6,5 @@ export enum HomeViewsEnum {
 }
 
 export const HomeViews: { [key in HomeViewsEnum]: DefineComponent } = {
-  [HomeViewsEnum.POSTS]: PostsView as DefineComponent,
+  [HomeViewsEnum.POSTS]: PostListView as DefineComponent,
 };
