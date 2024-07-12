@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import SignUpView from "@/views/Auth/SignUpView.vue";
+</script>
 <template>
   <div class="h-screen md:grid md:grid-cols-[2fr,1fr]">
     <div
@@ -8,7 +10,7 @@
       <span>" Thou quote, thy quote, thus quote!"</span>
     </div>
     <div class="w-full md:col-start-2">
-      <RouterView />
+      <component v-if="$route.name === 'signup'" :is="SignUpView" />
     </div>
   </div>
 </template>
