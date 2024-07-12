@@ -8,9 +8,9 @@ export interface Post {
   author: string;
   source: string;
   status: string;
-  deleted_at: string | null;
-  created_at: string;
-  updated_at: string;
+  deleted_at: Date | null;
+  created_at: Date;
+  updated_at: Date;
   user: User;
   likes_count: number;
   dislikes_count: number;
@@ -26,4 +26,19 @@ export enum PostBarActions {
 export enum PostStyles {
   CARD = "rounded-sm",
   CARD_ROUND = "rounded-xl",
+}
+
+export interface PostComment {
+  id: number;
+  post_id: number;
+  user_id: number;
+  parent_id: number | null;
+  content: string;
+  gif_url: string | null;
+  created_at: Date;
+  updated_at: Date;
+  likes_count: number;
+  dislikes_count: number;
+  user: User;
+  replies_count: number;
 }
