@@ -11,12 +11,9 @@ let collapsed = ref(false);
 </script>
 <template>
   <div>
-    <div class="w-full p-2">
+    <div class="w-full">
       <Panel
         toggleable
-        :class="[
-          { 'rounded-xl': postStore.post_style === PostStyles.CARD_ROUND },
-        ]"
         class="border-b border-t bg-surface-100 p-2 shadow-lg dark:border-surface-800 dark:bg-inherit"
       >
         <template #toggleicon>
