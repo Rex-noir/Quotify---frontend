@@ -26,7 +26,12 @@ const router = createRouter({
       component: () => import("@/views/Auth/SignUpView.vue"),
       meta: { layout: LayoutNames.AUTH },
     },
-
+    {
+      path: "/quotes/:id",
+      name: "viewQuote",
+      component: () => import("@/views/Quote/QuoteView.vue"),
+      meta: { layout: LayoutNames.POST },
+    },
   ],
 });
 
