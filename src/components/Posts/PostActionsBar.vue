@@ -13,7 +13,7 @@ const userStore = useUserStore();
 const handleClick = (action: PostBarActions) => {
   if (!userStore.status) {
     toast.add({
-      severity: "secondary",
+      severity: "info",
       detail: "Please login!",
       life: 1000,
     });
