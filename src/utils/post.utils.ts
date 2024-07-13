@@ -21,13 +21,22 @@ export default class PostUtils {
       const response = await api.get(url || `/posts/${id}/comments`);
       return response.data;
     } catch (error) {
+      throw error;  
+    }
+  }
+
+  static async loadReplies(id: number, url?: string): Promise<PostComment[]> {
+    try {
+      const response = await api.get(url || `/comments/replies/${id}`);
+      return response.data;
+    } catch (error) {
       throw error;
     }
   }
 
-  static async loadComments(id: number): Promise<PostComment[]> {
+  static async singleComment(id: number): Promise<PostComment> {
     try {
-      const response = await api.get(`/comments/replies/${id}`);
+      const response = await api.get(`/comments/${id}`);
       return response.data;
     } catch (error) {
       throw error;
