@@ -6,21 +6,34 @@ import PostActions from "./PostActionsBar.vue";
 import { ref } from "vue";
 import dayjs from "dayjs";
 import usePostStore from "@/stores/posts.store";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import useHomeViews from "@/stores/homeviews.store";
+import { HomeViewsEnum } from "@/types/Views/homeviews.type";
+import Button from "primevue/button";
 
 const router = useRouter();
+const route = useRoute();
 
 const props = defineProps<{ post: Post }>();
 const postStore = usePostStore();
+const homeView = useHomeViews();
 
 let collapsed = ref(false);
 
+const handleBackClick = () => {
+  homeView.setView(HomeViewsEnum.POSTS);
+  router.go(-1);
+};
+
 const viewPost = () => {
-  postStore.setCurrentPost(props.post);
-  router.push({
-    name: "viewQuote",
-    params: { id: props.post.id },
-  });
+  if (route.name !== "viewQuote") {
+    postStore.setCurrentPost(props.post);
+    homeView.setView(HomeViewsEnum.QUOTE);
+    router.push({
+      name: "viewQuote",
+      params: { id: props.post.id },
+    });
+  }
 };
 
 const headerClickFilter = (e: Event) => {
@@ -52,6 +65,13 @@ const headerClickFilter = (e: Event) => {
           </div>
         </template>
         <template #header>
+          <div v-if="$route.name !== 'home'">
+            <Button
+              icon="pi pi-arrow-left"
+              @click="handleBackClick"
+              class="prose border-none bg-inherit dark:prose-invert"
+            />
+          </div>
           <div
             @click="headerClickFilter"
             v-ripple
