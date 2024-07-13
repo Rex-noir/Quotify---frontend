@@ -30,7 +30,13 @@ const router = createRouter({
       path: "/quotes/:id",
       name: "viewQuote",
       component: () => import("@/views/Quote/QuoteView.vue"),
-      meta: { layout: LayoutNames.POST },
+      meta: { layout: LayoutNames.HOME },
+    },
+    {
+      path: "/quotes/comments/:id/replies",
+      name: "Replies",
+      component: () => import("@/Layouts/NestedComments.vue"),
+      meta: { layout: LayoutNames.HOME },
     },
   ],
 });
