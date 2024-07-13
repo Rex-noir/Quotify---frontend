@@ -9,21 +9,40 @@ import PostUtils from "@/utils/post.utils";
 import Chip from "primevue/chip";
 import type { User } from "@/types/User/user.types";
 import useResponsive from "@/stores/responsive.store";
+import usePostStore from "@/stores/posts.store";
+import { useRouter } from "vue-router";
 
 const commentsLoading = ref(false);
 const props = defineProps<{
   comment: PostComment;
   level: number;
   parentUser?: User;
+  nestedMain?: boolean;
 }>();
+
+const router = useRouter();
+
 const collapsed = ref(false);
-const replies = ref<PostComment[]>([]);
+const replies = ref<PostComment[] | null>(null);
 
-const responsive = useResponsive();
+const { layout } = useResponsive();
+const postStore = usePostStore();
 
+const navigatedToReplies = ref(false);
 
-const commentsLoaded = computed(() => {
-  return props.comment.replies_count === replies.value.length;
+const allRepliesLoaded = computed(() => {
+  return replies.value && props.comment.replies_count === replies.value.length;
+});
+
+const limit = computed(() => {
+  switch (layout) {
+    case "mobile":
+      return 2;
+    case "tablet":
+      return 6;
+    case "desktop":
+      return 12;
+  }
 });
 
 const colorPalette = [
@@ -40,9 +59,8 @@ const borderColors = computed(() => {
 
 const loadMore = async () => {
   commentsLoading.value = true;
-
   try {
-    const newReplies = await PostUtils.loadComments(props.comment.id);
+    const newReplies = await PostUtils.loadReplies(props.comment.id);
     replies.value = newReplies;
     commentsLoading.value = false;
   } catch (error) {
@@ -50,15 +68,30 @@ const loadMore = async () => {
     throw error;
   }
 };
+
+const handleLoadingMore = () => {
+  saveScrollPosition();
+  if (layout == "mobile" && props.level >= limit.value) {
+    postStore.setCurrentComment(props.comment);
+    navigatedToReplies.value = true; // Set the flag here
+    router.push({ name: "Replies", params: { id: props.comment.id } });
+  } else {
+    loadMore();
+  }
+};
+
+const saveScrollPosition = () => {
+  usePostStore().setScrollPosition(window.scrollY);
+};
 </script>
 <template>
   <div
-    class="comment relative flex w-full flex-col gap-3 border-none bg-none dark:bg-inherit"
+    class="comment relative flex h-full w-full flex-col gap-3 bg-none dark:bg-inherit"
   >
     <Panel
       :class="borderColors"
       toggleable
-      class="comment-parent rounded-none border-b-0 border-l-0 border-r-0 border-t-0 bg-inherit"
+      class="comment-parent rounded-none border-b-0 border-l-0 border-r-0 border-t-0 dark:bg-[#2d2a2a]"
     >
       <template #toggleicon>
         <div class="">
@@ -101,8 +134,8 @@ const loadMore = async () => {
       >
         <Chip
           class="prose dark:prose-invert dark:bg-surface-0"
-          :label="`${parentUser.name}`"
-          icon="pi pi-at"
+          :label="`@${parentUser.name}`"
+          icon="pi pi-reply"
         />
       </div>
       <div class="prose max-w-none p-2 py-2 leading-tight dark:prose-invert">
@@ -123,15 +156,23 @@ const loadMore = async () => {
         />
       </div>
       <div
-        v-if="comment.replies_count && !commentsLoaded"
-        class="prose flex items-center gap-2 p-2 dark:prose-invert"
+        v-if="
+          (!nestedMain &&
+            comment.replies_count &&
+            comment.replies_count > (replies?.length || 0)) ||
+          (level + 2 > limit && level !== 0 && !allRepliesLoaded)
+        "
+        class="prose flex max-w-none items-center justify-end gap-2 p-2 dark:prose-invert"
       >
-        <span @click="loadMore" class="cursor-pointer hover:text-purple-300">{{
-          `View ${comment.replies_count} replies`
-        }}</span>
+        <span
+          v-if="!commentsLoading"
+          @click="handleLoadingMore"
+          class="h-5 cursor-pointer hover:text-purple-300"
+          >{{ `View ${comment.replies_count} replies` }}</span
+        >
         <svg
           v-if="commentsLoading"
-          class="... mr-3 h-5 w-5 animate-spin"
+          class="mr-3 h-5 w-5 animate-spin"
           viewBox="0 0 24 24"
         >
           <circle
