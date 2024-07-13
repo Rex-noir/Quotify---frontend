@@ -2,23 +2,30 @@ import { defineStore } from "pinia";
 import { onMounted, onUnmounted, ref } from "vue";
 
 const useResponsive = defineStore("responsive", () => {
-  const isMobile = ref(false);
+  const layout = ref<"mobile" | "tablet" | "desktop">("mobile");
 
   const handleResize = () => {
-    isMobile.value = window.innerWidth <= 768;
+    const width = window.innerWidth;
+
+    if (width <= 425) {
+      layout.value = "mobile"; // Layout for max 425px
+    } else if (width <= 768) {
+      layout.value = "tablet"; // Layout for max 768px
+    } else {
+      layout.value = "desktop"; // Layout for anything larger
+    }
   };
 
   onMounted(() => {
-    window.addEventListener("resize", handleResize);
     handleResize();
-    console.log(handleResize)
+    window.addEventListener("resize", handleResize);
   });
 
   onUnmounted(() => {
     window.removeEventListener("resize", handleResize);
   });
 
-  return { isMobile };
+  return { layout };
 });
 
 export default useResponsive;
