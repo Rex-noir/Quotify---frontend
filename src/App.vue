@@ -13,16 +13,12 @@ router.afterEach((to) => {
 <template>
   <Toast position="bottom-center">
     <template #container="{ message, closeCallback }">
-      <div class="prose p-3 dark:prose-invert">
+      <div class="prose flex max-w-none justify-center py-2 dark:prose-invert">
         <span class="text-center text-base font-bold">
           {{ message.detail }}</span
         >
       </div>
     </template></Toast
   >
-  <router-view v-slot="{ Component, route }">
-    <keep-alive include="HomeLayout">
-      <component :is="layoutStore.currentLayout" />
-    </keep-alive>
-  </router-view>
+  <component :is="layoutStore.currentLayout" />
 </template>
