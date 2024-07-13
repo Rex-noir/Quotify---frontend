@@ -40,5 +40,5 @@ export interface PostComment {
   likes_count: number;
   dislikes_count: number;
   user: User;
-  replies_count: number;
+  replies_count: number | false;
 }
