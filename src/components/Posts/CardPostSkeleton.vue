@@ -11,10 +11,10 @@ let collapsed = ref(false);
 </script>
 <template>
   <div>
-    <div class="w-full">
+    <div class="w-full p-2">
       <Panel
         toggleable
-        class="border-b border-t bg-surface-100 p-2 shadow-lg dark:border-surface-800 dark:bg-inherit"
+        class="mb-1 border-b border-t bg-surface-100 shadow-lg dark:border-surface-800 dark:bg-inherit"
       >
         <template #toggleicon>
           <span
