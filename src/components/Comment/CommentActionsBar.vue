@@ -50,7 +50,7 @@ const handleClick = (action: PostBarActions) => {
       v-ripple
       class="action-container"
     >
-      <span class="pi pi-reply" aria-label="Comment" />
+      <span class="prose dark:prose-invert" aria-label="Reply">Reply</span>
     </div>
     <div
       @click="handleClick(PostBarActions.SHARE)"
