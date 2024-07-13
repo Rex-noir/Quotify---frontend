@@ -10,7 +10,9 @@ import SignUpView from "@/views/Auth/SignUpView.vue";
       <span>" Thou quote, thy quote, thus quote!"</span>
     </div>
     <div class="w-full md:col-start-2">
-      <component v-if="$route.name === 'signup'" :is="SignUpView" />
+      <router-view v-slot="{ Component }">
+        <component v-if="$route.name === 'signup'" :is="Component" />
+      </router-view>
     </div>
   </div>
 </template>
