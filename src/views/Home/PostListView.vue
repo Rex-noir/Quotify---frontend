@@ -22,8 +22,8 @@ onMounted(async () => {
   <main class="">
     <DataView :value="posts?.data">
       <template #empty>
-        <div class="flex flex-col gap-2" >
-          <CardPostSkeleton v-for="(items, index) in [1, 2, 3, 4, 5, 6, 7]" />
+        <div class="flex flex-col gap-2">
+          <CardPostSkeleton v-for="n in 10" />
         </div>
       </template>
       <template #list="slotProp">
