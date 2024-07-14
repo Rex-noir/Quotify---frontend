@@ -11,6 +11,7 @@ import type { User } from "@/types/User/user.types";
 import useResponsive from "@/stores/responsive.store";
 import usePostStore from "@/stores/posts.store";
 import { useRouter } from "vue-router";
+import Button from "primevue/button";
 
 const commentsLoading = ref(false);
 const props = defineProps<{
@@ -22,7 +23,6 @@ const props = defineProps<{
 
 const router = useRouter();
 
-const collapsed = ref(false);
 const replies = ref<PostComment[] | null>(null);
 
 const { layout } = useResponsive();
@@ -93,23 +93,23 @@ const saveScrollPosition = () => {
       toggleable
       class="comment-parent rounded-none border-b-0 border-l-0 border-r-0 border-t-0 dark:bg-[#2d2a2a]"
     >
-      <template #toggleicon>
+      <template #toggleicon="{ collapsed }">
         <div class="">
           <span
-            v-if="collapsed"
-            @click="collapsed = !collapsed"
-            class="pi pi-chevron-down"
-          ></span>
-          <span
-            v-else
-            @click="collapsed = !collapsed"
-            class="pi pi-chevron-up"
+            :class="collapsed ? 'pi pi-chevron-down' : 'pi pi-chevron-up'"
           ></span>
         </div>
       </template>
 
       <template #header>
         <div class="prose flex items-center gap-3 p-2 dark:prose-invert">
+          <div v-if="$route.name === 'Replies'">
+            <Button
+              icon="pi pi-arrow-left"
+              @click="$router.go(-1)"
+              class="prose border-none bg-inherit dark:prose-invert"
+            />
+          </div>
           <Avatar
             :label="comment?.user.name.charAt(0)"
             ass="mr-2"
@@ -140,20 +140,6 @@ const saveScrollPosition = () => {
       </div>
       <div class="prose max-w-none p-2 py-2 leading-tight dark:prose-invert">
         <p>{{ comment?.content }}</p>
-      </div>
-
-      <div class="flex">
-        <CommentActionBar :comment="comment" />
-      </div>
-
-      <div class="ml-4 flex flex-col" v-if="replies">
-        <Comment
-          v-for="reply in replies"
-          :key="reply.id"
-          :parent-user="comment.user"
-          :level="level + 1"
-          :comment="reply"
-        />
       </div>
       <div
         v-if="
@@ -189,6 +175,19 @@ const saveScrollPosition = () => {
             d="M4 12a8 8 0 018-8v8H4z"
           ></path>
         </svg>
+      </div>
+      <div class="flex">
+        <CommentActionBar :comment="comment" />
+      </div>
+
+      <div class="ml-4 flex flex-col" v-if="replies">
+        <Comment
+          v-for="reply in replies"
+          :key="reply.id"
+          :parent-user="comment.user"
+          :level="level + 1"
+          :comment="reply"
+        />
       </div>
     </Panel>
   </div>
