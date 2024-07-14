@@ -18,8 +18,6 @@ const props = defineProps<{ post: Post }>();
 const postStore = usePostStore();
 const homeView = useHomeViews();
 
-let collapsed = ref(false);
-
 const handleBackClick = () => {
   homeView.setView(HomeViewsEnum.POSTS);
   router.go(-1);
@@ -50,17 +48,10 @@ const headerClickFilter = (e: Event) => {
         toggleable
         class="mb-1 cursor-pointer divide-purple-400 rounded-none border-none bg-surface-100 shadow-md transition-all dark:bg-[#2d2a2a]"
       >
-        <template #toggleicon>
-          <div>
+        <template #toggleicon="{ collapsed }">
+          <div class="">
             <span
-              v-if="collapsed"
-              @click="collapsed = !collapsed"
-              class="pi pi-chevron-down"
-            ></span>
-            <span
-              v-else
-              @click="collapsed = !collapsed"
-              class="pi pi-chevron-up"
+              :class="collapsed ? 'pi pi-chevron-down' : 'pi pi-chevron-up'"
             ></span>
           </div>
         </template>
