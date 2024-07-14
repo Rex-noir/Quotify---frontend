@@ -5,7 +5,7 @@ import Comment from "@/components/Comment/Comment.vue";
 import PostUtils from "@/utils/post.utils";
 import type { PostComment } from "@/types/Post/post.types";
 import usePostStore from "@/stores/posts.store";
-import Button from "primevue/button";
+import CommentSkeleton from "@/components/Comment/CommentSkeleton.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -56,27 +56,28 @@ const loadComments = async () => {
 </script>
 <template>
   <div class="flex flex-col gap-2">
-    <Button outlined class="ml-2 w-fit border-none" @click="goBack"
-      >Go back</Button
-    >
     <div class="flex flex-col gap-2">
-      <div v-if="comment">
+      <div>
         <Comment
+          v-if="comment"
           :comment="comment"
           :parent-user="parentComment?.user"
           :level="0"
           :nested-main="true"
           :key="comment.id"
         />
+        <CommentSkeleton v-else />
       </div>
-      <div class="ml-3 flex flex-col gap-2" v-if="replies">
+      <div class="ml-3 flex flex-col gap-2">
         <Comment
+          v-if="replies"
           v-for="reply in replies"
           :parent-user="comment?.user"
           :comment="reply"
           :level="0"
           :key="comment?.id"
         />
+        <CommentSkeleton v-else v-for="n in 3" />
       </div>
     </div>
   </div>

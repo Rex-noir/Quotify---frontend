@@ -9,6 +9,7 @@ import { useRoute } from "vue-router";
 import CardPost from "@/components/Posts/CardPost.vue";
 import CardPostSkeleton from "@/components/Posts/CardPostSkeleton.vue";
 import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
+import CommentSkeleton from "@/components/Comment/CommentSkeleton.vue";
 
 const postStore = usePostStore();
 const post = ref<Post>();
@@ -56,17 +57,16 @@ watch(route, (newRoute) => {
   <div class="flex h-full flex-col p-2">
     <CardPostSkeleton v-if="!post"></CardPostSkeleton>
     <CardPost v-if="post" :post="post as Post"></CardPost>
-    <div
-      v-if="comments"
-      class="prose flex max-w-none flex-col gap-3 dark:prose-invert"
-    >
+    <div class="prose flex max-w-none flex-col gap-3 p-2 dark:prose-invert">
       <h3>Comments</h3>
       <Comment
+        v-if="comments"
         v-for="(comment, index) in comments?.data"
         :comment="comment"
         :level="0"
-        :key="comment.id"
+        :key="comment.id && $route.fullPath"
       ></Comment>
+      <CommentSkeleton v-for="n in 3" v-else />
     </div>
   </div>
 </template>
