@@ -5,7 +5,6 @@ import CommunitiesView from "@/views/Home/CommunitiesView.vue";
 import SideLoggedIn from "@/components/SideBar/SideLoggedIn.vue";
 import SideNotLoggedIn from "@/components/SideBar/SideNotLoggedIn.vue";
 import useUserStore from "@/stores/user.store";
-import PostListView from "@/views/Home/PostListView.vue";
 
 const userStore = useUserStore();
 </script>
@@ -18,11 +17,9 @@ const userStore = useUserStore();
       class="fixed z-50 hidden w-full bg-surface-100 dark:bg-surface-0 lg:grid"
     />
     <div
-      class="relative top-[7rem] grid h-full md:top-[3.6rem] md:grid-cols-3 lg:top-12 lg:grid-cols-[250px,1fr,1fr,1fr]"
+      class="top-[7rem] grid md:top-[3.6rem] relative md:grid-cols-3 lg:top-20 lg:grid-cols-[1fr,1fr,1fr,1fr]"
     >
-      <div
-        class="hidden h-screen lg:fixed lg:col-start-1 lg:block lg:w-80 lg:max-w-[250px]"
-      >
+      <div class="hidden h-full w-full lg:col-start-1 lg:block">
         <component v-if="userStore.status" :is="SideLoggedIn" />
         <component v-else :is="SideNotLoggedIn" />
       </div>

@@ -37,9 +37,11 @@ const handleLogin = async () => {
 };
 </script>
 <template>
-  <div class="h-full w-full bg-surface-100 p-3 dark:bg-surface-0">
+  <div
+    class="flex h-full w-full flex-col items-center bg-surface-100 p-3 dark:bg-surface-0"
+  >
     <div
-      class="title-styles prose flex w-full flex-col items-center justify-center dark:prose-invert"
+      class="title-styles prose sticky top-28 flex w-full flex-col items-center justify-center dark:prose-invert"
     >
       <form @submit.prevent="handleLogin" class="flex flex-col gap-3">
         <h1 class="mb-0 p-0">Login</h1>
@@ -96,7 +98,7 @@ const handleLogin = async () => {
         outlined
         size="small"
         @click="theRouter.push({ name: 'signup' })"
-        class="mx-auto w-full"
+        class="mx-auto w-fit"
         label="Sign Up"
       />
     </div>
