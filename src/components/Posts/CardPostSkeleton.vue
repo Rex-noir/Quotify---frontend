@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { PostStyles, type Post } from "@/types/Post/post.types";
 import Panel from "primevue/panel";
 import { ref } from "vue";
-import usePostStore from "@/stores/posts.store";
 import Skeleton from "primevue/skeleton";
 import PostActionBarSkeleton from "./PostActionBarSkeleton.vue";
+import { useRouter } from "vue-router";
+import Button from "primevue/button";
 
-const postStore = usePostStore();
+const router = useRouter();
 let collapsed = ref(false);
+const handleBackClick = () => {
+  router.go(-1);
+};
 </script>
 <template>
   <div>
@@ -31,6 +34,13 @@ let collapsed = ref(false);
         <template #header>
           <div>
             <div class="mb-1 flex h-full items-center gap-1">
+              <div v-if="$route.name !== 'home'">
+                <Button
+                  icon="pi pi-arrow-left"
+                  @click="handleBackClick"
+                  class="prose border-none bg-inherit dark:prose-invert"
+                />
+              </div>
               <Skeleton class="mb-2 rounded-full p-4" width="30px"></Skeleton>
               <div class="flex flex-col gap-1">
                 <Skeleton width="10rem"></Skeleton>
