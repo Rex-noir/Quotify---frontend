@@ -14,7 +14,7 @@ const prefStore = usePrefStore();
 </script>
 <template>
   <div class="h-full bg-surface-100 dark:bg-surface-0">
-    <div class="flex flex-col p-2">
+    <div class="sticky top-16 flex flex-col p-2">
       <div
         v-ripple
         v-for="(item, index) in options"
