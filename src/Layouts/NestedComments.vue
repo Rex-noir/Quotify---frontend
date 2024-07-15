@@ -7,7 +7,6 @@ import type { PostComment } from "@/types/Post/post.types";
 import usePostStore from "@/stores/posts.store";
 import CommentSkeleton from "@/components/Comment/CommentSkeleton.vue";
 
-const router = useRouter();
 const route = useRoute();
 const postStore = usePostStore();
 
@@ -15,11 +14,9 @@ const comment = ref<PostComment | null>(null);
 const replies = ref<PostComment[] | null>(null);
 const parentComment = ref<PostComment | null>(null);
 
-const goBack = () => {
-  router.go(-1);
-};
-
 onMounted(async () => {
+  window.scrollTo(0, 0);
+
   if (postStore.currentComment) {
     comment.value = postStore.currentComment;
   } else {
@@ -64,7 +61,7 @@ const loadComments = async () => {
           :parent-user="parentComment?.user"
           :level="0"
           :nested-main="true"
-          :key="comment.id"
+          :key="comment.id + $route.fullPath"
         />
         <CommentSkeleton v-else />
       </div>
@@ -75,9 +72,11 @@ const loadComments = async () => {
           :parent-user="comment?.user"
           :comment="reply"
           :level="0"
-          :key="comment?.id"
+          :key="comment?.id + $route.fullPath"
         />
-        <CommentSkeleton v-else v-for="n in 3" />
+        <div v-else>
+          <CommentSkeleton v-for="n in 3" />
+        </div>
       </div>
     </div>
   </div>
