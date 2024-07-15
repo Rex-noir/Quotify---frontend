@@ -14,14 +14,14 @@ export default class PostUtils {
     }
   }
   static async fetchComments(
-    id: number,
+    id?: number,
     url?: string,
   ): Promise<PaginatedResponse<PostComment>> {
     try {
       const response = await api.get(url || `/posts/${id}/comments`);
       return response.data;
     } catch (error) {
-      throw error;  
+      throw error;
     }
   }
 
