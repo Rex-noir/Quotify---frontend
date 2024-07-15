@@ -103,7 +103,7 @@ const saveScrollPosition = () => {
 
       <template #header>
         <div class="prose flex items-center gap-3 p-2 dark:prose-invert">
-          <div v-if="$route.name === 'Replies'">
+          <div v-if="nestedMain">
             <Button
               icon="pi pi-arrow-left"
               @click="$router.go(-1)"
