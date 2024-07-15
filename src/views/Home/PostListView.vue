@@ -1,26 +1,66 @@
 <script setup lang="ts">
 import type { Post } from "@/types/Post/post.types";
 import DataView from "primevue/dataview";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import CardPost from "@/components/Posts/CardPost.vue";
 import PostUtils from "@/utils/post.utils";
 import CardPostSkeleton from "@/components/Posts/CardPostSkeleton.vue";
 import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
 
-const posts = ref<PaginatedResponse<Post>>();
-onMounted(async () => {
+const posts = ref<Post[]>([]);
+const isLoading = ref(false);
+
+const paginatedPosts = ref<PaginatedResponse<Post>>();
+const hasMore = computed(() => {
+  return paginatedPosts.value?.next_page_url !== null;
+});
+
+const observerLoader = async (entries: IntersectionObserverEntry[]) => {
+  const entry = entries[0];
+  if (entry.isIntersecting && !isLoading.value && hasMore.value) {
+    await fetchPost(paginatedPosts.value?.next_page_url || undefined);
+  }
+};
+
+const observer = new IntersectionObserver(observerLoader, {
+  root: null,
+  rootMargin: "0px",
+  threshold: 1.0,
+});
+
+const fetchPost = async (url?: string) => {
+  isLoading.value = true;
   try {
-    const response = await PostUtils.fetchPosts();
-    posts.value = response as PaginatedResponse<Post>;
+    const response = (await PostUtils.fetchPosts(
+      url,
+    )) as PaginatedResponse<Post>;
+    paginatedPosts.value = response;
+    posts.value = [...posts.value, ...response.data];
+
+    isLoading.value = false;
   } catch (error) {
+    isLoading.value = false;
+
     throw error;
   }
+};
+
+onMounted(async () => {
+  await fetchPost();
+  const postLoader = document.querySelector("#postsLoader");
+  if (postLoader) {
+    observer.observe(postLoader);
+  }
+});
+
+onUnmounted(() => {
+  observer.disconnect();
 });
 </script>
 
 <template>
   <main class="">
-    <DataView :value="posts?.data">
+    <DataView :value="posts">
       <template #empty>
         <div class="flex flex-col gap-2">
           <CardPostSkeleton v-for="n in 10" />
@@ -33,6 +73,15 @@ onMounted(async () => {
             :post="post as Post"
             :key="post.id"
           ></CardPost>
+          <div id="postsLoader" v-if="hasMore && posts" class="flex flex-col">
+            <CardPostSkeleton :key="'isLoading'" />
+          </div>
+          <div
+            v-else
+            class="prose-gray w-full max-w-none text-center dark:prose-invert dark:text-white"
+          >
+            <span>You have reached the end of the feeds!</span>
+          </div>
         </div>
       </template>
     </DataView>
