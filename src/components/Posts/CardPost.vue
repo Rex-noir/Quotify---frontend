@@ -3,7 +3,6 @@ import { type Post } from "@/types/Post/post.types";
 import Panel from "primevue/panel";
 import Avatar from "primevue/avatar";
 import PostActions from "./PostActionsBar.vue";
-import { ref } from "vue";
 import dayjs from "dayjs";
 import usePostStore from "@/stores/posts.store";
 import { useRoute, useRouter } from "vue-router";
@@ -26,7 +25,6 @@ const handleBackClick = () => {
 const viewPost = () => {
   if (route.name !== "viewQuote") {
     postStore.setCurrentPost(props.post);
-    homeView.setView(HomeViewsEnum.QUOTE);
     router.push({
       name: "viewQuote",
       params: { id: props.post.id },
