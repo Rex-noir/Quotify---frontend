@@ -1,0 +1,18 @@
+<script setup lang="ts">
+const props = defineProps<{ color: string }>();
+</script>
+<template>
+  <div>
+    <svg class="mr-3 h-5 w-5 animate-spin" viewBox="0 0 24 24">
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        :stroke="color"
+        stroke-width="4"
+      ></circle>
+      <path class="opacity-75" :fill="color" d="M4 12a8 8 0 018-8v8H4z"></path>
+    </svg>
+  </div>
+</template>
