@@ -17,6 +17,11 @@ const app = createApp(App);
 app.use(createPinia());
 app.use(router);
 app.directive("ripple", Ripple);
+app.directive("focus", {
+  mounted(el) {
+    el.focus();
+  },
+});
 app.use(PrimeVue, {
   ripple: true,
   theme: {
