@@ -46,10 +46,6 @@ const router = useRouter();
 
 const showReplyEditor = ref(false);
 
-const postStore = usePostStore();
-
-const navigatedToReplies = ref(false);
-
 const limit = commentStore.nestedLimit;
 
 const colorPalette = [
@@ -81,8 +77,6 @@ const loadReplies = async () => {
 const handleLoadingMore = async () => {
   saveScrollPosition();
   if (currentComment.value.level >= limit) {
-    postStore.setCurrentComment(props.comment);
-    navigatedToReplies.value = true; // Set the flag here
     router.push({
       name: "Replies",
       params: { comment_id: props.comment.id, post_id: props.comment.post_id },
@@ -119,7 +113,12 @@ const saveScrollPosition = () => {
           <div v-if="nestedMain">
             <Button
               icon="pi pi-arrow-left"
-              @click="$router.go(-1)"
+              @click="
+                $router.push({
+                  name: 'viewQuote',
+                  params: { id: comment.post_id },
+                })
+              "
               class="prose border-none bg-inherit p-0 dark:prose-invert"
             />
           </div>
@@ -146,7 +145,7 @@ const saveScrollPosition = () => {
         class="prose prose-purple p-2 font-bold dark:prose-invert"
       >
         <Chip
-          class="prose dark:prose-invert px-2 p-0 text-sm dark:bg-surface-0"
+          class="prose p-0 px-2 text-sm dark:prose-invert dark:bg-surface-0"
           :label="`@${parentUser.name}`"
           icon="pi pi-reply"
         />
