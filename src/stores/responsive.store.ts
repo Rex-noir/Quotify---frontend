@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { onMounted, onUnmounted, ref } from "vue";
+import { ref } from "vue";
 
 const useResponsive = defineStore("responsive", () => {
   const layout = ref<"mobile" | "tablet" | "desktop">("mobile");
@@ -16,14 +16,8 @@ const useResponsive = defineStore("responsive", () => {
     }
   };
 
-  onMounted(() => {
-    handleResize();
-    window.addEventListener("resize", handleResize);
-  });
-
-  onUnmounted(() => {
-    window.removeEventListener("resize", handleResize);
-  });
+  handleResize();
+  window.addEventListener("resize", handleResize);
 
   return { layout };
 });
