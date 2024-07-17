@@ -6,8 +6,11 @@ import CardPost from "@/components/Posts/CardPost.vue";
 import PostUtils from "@/utils/post.utils";
 import CardPostSkeleton from "@/components/Posts/CardPostSkeleton.vue";
 import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
+import usePostStore from "@/stores/posts.store";
 
-const posts = ref<Post[]>([]);
+const postStore = usePostStore();
+
+const posts = ref(postStore.posts);
 const isLoading = ref(false);
 
 const paginatedPosts = ref<PaginatedResponse<Post>>();
@@ -25,7 +28,7 @@ const observerLoader = async (entries: IntersectionObserverEntry[]) => {
 const observer = new IntersectionObserver(observerLoader, {
   root: null,
   rootMargin: "0px",
-  threshold: 1.0,
+  threshold: 0.1,
 });
 
 const fetchPost = async (url?: string) => {
@@ -35,12 +38,10 @@ const fetchPost = async (url?: string) => {
       url,
     )) as PaginatedResponse<Post>;
     paginatedPosts.value = response;
-    posts.value = [...posts.value, ...response.data];
-
+    response.data.forEach((post) => postStore.addPost(post));
     isLoading.value = false;
   } catch (error) {
     isLoading.value = false;
-
     throw error;
   }
 };

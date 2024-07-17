@@ -5,8 +5,17 @@ import CommunitiesView from "@/views/Home/CommunitiesView.vue";
 import SideLoggedIn from "@/components/SideBar/SideLoggedIn.vue";
 import SideNotLoggedIn from "@/components/SideBar/SideNotLoggedIn.vue";
 import useUserStore from "@/stores/user.store";
+import usePostStore from "@/stores/posts.store";
+import { onMounted, onUnmounted } from "vue";
 
 const userStore = useUserStore();
+const postStore = usePostStore();
+onMounted(() => {
+  postStore.startListeningForUpdates();
+});
+onUnmounted(() => {
+  postStore.stopListeningForUpdates();
+});
 </script>
 <template>
   <div class="h-ful relative">

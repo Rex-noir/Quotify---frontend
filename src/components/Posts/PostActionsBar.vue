@@ -1,12 +1,19 @@
 <script setup lang="ts">
+import usePostStore from "@/stores/posts.store";
 import useUserStore from "@/stores/user.store";
 import { PostBarActions, type Post } from "@/types/Post/post.types";
 import { useToast } from "primevue/usetoast";
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps<{
   post: Post;
 }>();
+
+const postStore = usePostStore();
+const post = computed(() =>
+  postStore.posts.find((p) => p.id === props.post.id),
+);
 
 const toast = useToast();
 const router = useRouter();

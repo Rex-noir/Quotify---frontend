@@ -14,9 +14,10 @@ import CommentEditor from "@/components/Comment/CommentEditor.vue";
 import useCommentStore from "@/stores/comments.store";
 
 const postStore = usePostStore();
-const post = ref<Post>();
 const route = useRoute();
+const currentPostId = Number(route.params.id);
 const errMessage = ref<string>();
+const post = ref<Post | null>(null);
 
 const commentStore = useCommentStore();
 const paginatedComments = ref<PaginatedResponse<PostComment> | null>(null);
@@ -62,7 +63,6 @@ const loadComments = async (url?: string) => {
 watch(post, async (newPost) => {
   if (newPost?.id && post.value) {
     await loadComments();
-    commentStore.listenForComments(post.value.id);
     await nextTick();
     const commentLoader = document.querySelector("div#loaderComments");
     if (commentLoader) {
@@ -74,7 +74,6 @@ watch(post, async (newPost) => {
 onUnmounted(() => {
   postStore.setScrollPosition(0);
   observer.disconnect();
-  commentStore.stopListeningForComments(post.value?.id as number);
 });
 
 watch(route, (newRoute) => {
@@ -83,12 +82,15 @@ watch(route, (newRoute) => {
 
 onMounted(async () => {
   window.scrollTo(0, 0);
-  if (postStore.currentPost) {
-    post.value = postStore.currentPost;
-  } else {
+  post.value = postStore.posts.find((p) => p.id === currentPostId) || null;
+
+  if (!post.value) {
     try {
-      const posts = await PostUtils.fetchPosts(`/posts/${route.params.id}`);
-      post.value = posts as Post;
+      const fetchedPost = await PostUtils.fetchPosts(
+        `/posts/${route.params.id}`,
+      );
+      postStore.addPost(fetchedPost as Post);
+      post.value = postStore.posts.find((p) => p.id === currentPostId) || null;
     } catch (error) {
       if (isAxiosError(error)) {
         errMessage.value = error.response?.data.message;

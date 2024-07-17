@@ -7,12 +7,12 @@ import { useRouter } from "vue-router";
 const useCommentStore = defineStore("comments", () => {
   const comments = ref<{ [postId: number]: { [id: number]: PostComment } }>([]);
 
-  const layout = useResponsive().layout;
+  const layout = computed(() => useResponsive().layout);
 
   const router = useRouter();
 
   const nestedLimit = computed(() => {
-    switch (layout) {
+    switch (layout.value) {
       case "mobile":
         return 2;
       case "tablet":
@@ -72,10 +72,11 @@ const useCommentStore = defineStore("comments", () => {
   }
 
   function listenForComments(post_id: number) {
-    window.Echo.channel(`post.${post_id}`).listen(
+    window.Echo.channel(`posts`).listen(
       `CommentAdded`,
       (e: { comment: PostComment }) => {
         addComment(e.comment, e.comment.post_id);
+        console.log(e);
       },
     );
   }
