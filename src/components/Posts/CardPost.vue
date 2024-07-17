@@ -19,12 +19,11 @@ const homeView = useHomeViews();
 
 const handleBackClick = () => {
   homeView.setView(HomeViewsEnum.POSTS);
-  router.go(-1);
+  router.push({ name: "home" });
 };
 
 const viewPost = () => {
   if (route.name !== "viewQuote") {
-    postStore.setCurrentPost(props.post);
     router.push({
       name: "viewQuote",
       params: { id: props.post.id },
