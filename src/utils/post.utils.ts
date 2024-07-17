@@ -42,4 +42,21 @@ export default class PostUtils {
       throw error;
     }
   }
+
+  static async postComment(data: {
+    content: string;
+    postId: number;
+    parentId?: number;
+  }) {
+    try {
+      const response = await api.post("/comments", {
+        content: data.content,
+        post_id: data.postId,
+        parent_id: data.parentId,
+      });
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

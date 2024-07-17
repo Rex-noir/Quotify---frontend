@@ -8,42 +8,49 @@ import { computed, ref } from "vue";
 import PostUtils from "@/utils/post.utils";
 import Chip from "primevue/chip";
 import type { User } from "@/types/User/user.types";
-import useResponsive from "@/stores/responsive.store";
 import usePostStore from "@/stores/posts.store";
 import { useRouter } from "vue-router";
 import Button from "primevue/button";
+import CommentEditor from "./CommentEditor.vue";
+import useCommentStore from "@/stores/comments.store";
 
 const commentsLoading = ref(false);
 const props = defineProps<{
   comment: PostComment;
-  level: number;
   parentUser?: User;
   nestedMain?: boolean;
 }>();
 
+const commentStore = useCommentStore();
+const currentComment = ref(
+  commentStore.comments[props.comment.post_id][props.comment.id],
+);
+const commentLoaded = ref<boolean>(false);
+
+const showViewMoreReplies = computed(() => {
+  return (
+    (currentComment.value.replies_count &&
+      (currentComment.value.replies_count as number) > 0 &&
+      currentComment.value.replies?.length !==
+        currentComment.value.replies_count &&
+      !props.nestedMain &&
+      !commentLoaded.value) ||
+    (currentComment.value.level + 1 >= limit &&
+      currentComment.value.replies_count > 0 &&
+      !props.nestedMain &&
+      !commentLoaded.value)
+  );
+});
+
 const router = useRouter();
 
-const replies = ref<PostComment[] | null>(null);
+const showReplyEditor = ref(false);
 
-const { layout } = useResponsive();
 const postStore = usePostStore();
 
 const navigatedToReplies = ref(false);
 
-const allRepliesLoaded = computed(() => {
-  return replies.value && props.comment.replies_count === replies.value.length;
-});
-
-const limit = computed(() => {
-  switch (layout) {
-    case "mobile":
-      return 2;
-    case "tablet":
-      return 6;
-    case "desktop":
-      return 12;
-  }
-});
+const limit = commentStore.nestedLimit;
 
 const colorPalette = [
   "border-green-600", // Level 0
@@ -54,14 +61,16 @@ const colorPalette = [
 ];
 
 const borderColors = computed(() => {
-  return colorPalette[props.level % colorPalette.length];
+  return colorPalette[currentComment.value.level % colorPalette.length];
 });
 
-const loadMore = async () => {
+const loadReplies = async () => {
   commentsLoading.value = true;
   try {
     const newReplies = await PostUtils.loadReplies(props.comment.id);
-    replies.value = newReplies;
+    newReplies.forEach((reply) =>
+      commentStore.addComment(reply, reply.post_id),
+    );
     commentsLoading.value = false;
   } catch (error) {
     commentsLoading.value = false;
@@ -69,14 +78,18 @@ const loadMore = async () => {
   }
 };
 
-const handleLoadingMore = () => {
+const handleLoadingMore = async () => {
   saveScrollPosition();
-  if (layout == "mobile" && props.level >= limit.value) {
+  if (currentComment.value.level >= limit) {
     postStore.setCurrentComment(props.comment);
     navigatedToReplies.value = true; // Set the flag here
-    router.push({ name: "Replies", params: { id: props.comment.id } });
+    router.push({
+      name: "Replies",
+      params: { comment_id: props.comment.id, post_id: props.comment.post_id },
+    });
   } else {
-    loadMore();
+    await loadReplies();
+    commentLoaded.value = true;
   }
 };
 
@@ -102,12 +115,12 @@ const saveScrollPosition = () => {
       </template>
 
       <template #header>
-        <div class="prose flex items-center gap-3 p-2 dark:prose-invert">
+        <div class="prose flex items-center gap-1 p-2 dark:prose-invert">
           <div v-if="nestedMain">
             <Button
               icon="pi pi-arrow-left"
               @click="$router.go(-1)"
-              class="prose border-none bg-inherit dark:prose-invert"
+              class="prose border-none bg-inherit p-0 dark:prose-invert"
             />
           </div>
           <Avatar
@@ -133,7 +146,7 @@ const saveScrollPosition = () => {
         class="prose prose-purple p-2 font-bold dark:prose-invert"
       >
         <Chip
-          class="prose dark:prose-invert dark:bg-surface-0"
+          class="prose dark:prose-invert px-2 p-0 text-sm dark:bg-surface-0"
           :label="`@${parentUser.name}`"
           icon="pi pi-reply"
         />
@@ -141,14 +154,22 @@ const saveScrollPosition = () => {
       <div class="prose max-w-none p-2 py-2 leading-tight dark:prose-invert">
         <p>{{ comment?.content }}</p>
       </div>
+      <div class="flex">
+        <CommentActionBar
+          @reply-clicked="showReplyEditor = !showReplyEditor"
+          :comment="comment"
+        />
+      </div>
+      <div v-if="showReplyEditor" class="p-3">
+        <CommentEditor
+          @comment-success="showReplyEditor = false"
+          :post-id="comment.post_id"
+          :parent-comment="comment"
+        />
+      </div>
       <div
-        v-if="
-          (!nestedMain &&
-            comment.replies_count &&
-            comment.replies_count > (replies?.length || 0)) ||
-          (level + 2 > limit && level !== 0 && !allRepliesLoaded)
-        "
-        class="prose flex max-w-none items-center justify-end gap-2 p-2 dark:prose-invert"
+        v-if="showViewMoreReplies"
+        class="prose flex max-w-none items-center justify-end gap-2 dark:prose-invert"
       >
         <span
           v-if="!commentsLoading"
@@ -176,16 +197,16 @@ const saveScrollPosition = () => {
           ></path>
         </svg>
       </div>
-      <div class="flex">
-        <CommentActionBar :comment="comment" />
-      </div>
-
-      <div class="ml-4 flex flex-col" v-if="replies">
+      <div
+        class="ml-4 flex flex-col"
+        v-if="
+          currentComment.replies && currentComment.level < limit && !nestedMain
+        "
+      >
         <Comment
-          v-for="reply in replies"
+          v-for="reply in currentComment.replies"
           :key="reply.id"
           :parent-user="comment.user"
-          :level="level + 1"
           :comment="reply"
         />
       </div>

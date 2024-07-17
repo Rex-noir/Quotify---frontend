@@ -28,7 +28,7 @@ const handleClick = (action: PostBarActions) => {
 </script>
 <template>
   <div
-    class="prose grid w-full max-w-none grid-cols-4 place-items-center gap-2 border-t dark:prose-invert dark:border-slate-800"
+    class="prose grid w-full max-w-none grid-cols-4 place-items-center gap-2 dark:prose-invert"
   >
     <Skeleton height="2rem" width="70px" />
     <Skeleton height="2rem" width="70px" />

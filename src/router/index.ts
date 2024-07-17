@@ -33,7 +33,7 @@ const router = createRouter({
       meta: { layout: LayoutNames.HOME },
     },
     {
-      path: "/quotes/comments/:id/replies",
+      path: "/quotes/:post_id/comments/:comment_id/replies",
       name: "Replies",
       component: () => import("@/Layouts/NestedComments.vue"),
       meta: { layout: LayoutNames.HOME },

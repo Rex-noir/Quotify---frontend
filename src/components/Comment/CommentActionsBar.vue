@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import useUserStore from "@/stores/user.store";
-import { PostBarActions, type PostComment } from "@/types/Post/post.types";
+import { CommentBarActions, type PostComment } from "@/types/Post/post.types";
 import { useToast } from "primevue/usetoast";
+import { ref } from "vue";
 
 defineProps<{
   comment?: PostComment;
 }>();
 
 const toast = useToast();
+const emit = defineEmits<{ replyClicked: [] }>();
+const commentEditorCollapsed = ref(false);
 
 const userStore = useUserStore();
-const handleClick = (action: PostBarActions) => {
+const handleClick = (action: CommentBarActions) => {
   if (!userStore.status) {
     toast.add({
       severity: "info",
@@ -18,27 +21,29 @@ const handleClick = (action: PostBarActions) => {
       life: 1000,
     });
   } else {
-    // switch (action) {
-    //   // case PostBarActions.COMMENT:
-    //   //   break;
-    // }
+    switch (action) {
+      case CommentBarActions.COMMENT:
+        emit("replyClicked");
+        commentEditorCollapsed.value = !commentEditorCollapsed.value;
+        break;
+    }
   }
 };
 </script>
 <template>
   <div
-    class="prose grid w-full max-w-none grid-cols-4 place-items-center gap-2 border-t dark:prose-invert dark:border-slate-800"
+    class="prose grid w-full max-w-none grid-cols-4 place-items-center gap-2 dark:prose-invert"
   >
     <div
       v-ripple
-      @click="handleClick(PostBarActions.LIKE)"
+      @click="handleClick(CommentBarActions.LIKE)"
       class="action-container"
     >
       <span>{{ comment?.likes_count ? comment?.likes_count : "0" }}</span>
       <span class="pi pi-thumbs-up" aria-label="Like" />
     </div>
     <div
-      @click="handleClick(PostBarActions.DISLIKE)"
+      @click="handleClick(CommentBarActions.DISLIKE)"
       v-ripple
       class="action-container"
     >
@@ -46,14 +51,18 @@ const handleClick = (action: PostBarActions) => {
       <span class="pi pi-thumbs-down" aria-label="Dislike" />
     </div>
     <div
-      @click="handleClick(PostBarActions.COMMENT)"
+      @click="handleClick(CommentBarActions.COMMENT)"
       v-ripple
       class="action-container"
     >
-      <span class="prose dark:prose-invert" aria-label="Reply">Reply</span>
+      <span
+        class="prose dark:prose-invert"
+        :aria-label="commentEditorCollapsed ? 'Close' : 'Reply'"
+        >Reply</span
+      >
     </div>
     <div
-      @click="handleClick(PostBarActions.SHARE)"
+      @click="handleClick(CommentBarActions.SHARE)"
       v-ripple
       class="action-container h-full"
     >

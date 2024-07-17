@@ -2,26 +2,33 @@
 import useUserStore from "@/stores/user.store";
 import { PostBarActions, type Post } from "@/types/Post/post.types";
 import { useToast } from "primevue/usetoast";
+import { useRouter } from "vue-router";
 
-defineProps<{
-  post?: Post;
+const props = defineProps<{
+  post: Post;
 }>();
 
 const toast = useToast();
+const router = useRouter();
 
 const userStore = useUserStore();
+
 const handleClick = (action: PostBarActions) => {
-  if (!userStore.status) {
+  if (!userStore.status && action !== PostBarActions.COMMENT) {
     toast.add({
       severity: "info",
       detail: "Please login!",
       life: 1000,
     });
   } else {
-    // switch (action) {
-    //   // case PostBarActions.COMMENT:
-    //   //   break;
-    // }
+    switch (action) {
+      case PostBarActions.COMMENT:
+        router.push({
+          name: "viewQuote",
+          params: { id: props?.post.id },
+        });
+        break;
+    }
   }
 };
 </script>

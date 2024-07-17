@@ -16,7 +16,15 @@ export interface Post {
   dislikes_count: number;
   comments_count: number;
 }
+
 export enum PostBarActions {
+  LIKE = "Like",
+  DISLIKE = "Dislike",
+  SHARE = "Share",
+  COMMENT = "Comment",
+}
+
+export enum CommentBarActions {
   LIKE = "Like",
   DISLIKE = "Dislike",
   SHARE = "Share",
@@ -40,5 +48,7 @@ export interface PostComment {
   likes_count: number;
   dislikes_count: number;
   user: User;
-  replies_count: number | false;
+  replies_count: number;
+  level: number;
+  replies: PostComment[] | null;
 }

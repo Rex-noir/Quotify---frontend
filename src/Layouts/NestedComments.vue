@@ -1,83 +1,74 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import Comment from "@/components/Comment/Comment.vue";
+import useCommentStore from "@/stores/comments.store";
 import PostUtils from "@/utils/post.utils";
+import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import Comment from "@/components/Comment/Comment.vue";
 import type { PostComment } from "@/types/Post/post.types";
-import usePostStore from "@/stores/posts.store";
-import CommentSkeleton from "@/components/Comment/CommentSkeleton.vue";
 
 const route = useRoute();
-const postStore = usePostStore();
-
-const comment = ref<PostComment | null>(null);
-const replies = ref<PostComment[] | null>(null);
+const commentStore = useCommentStore();
+const currentCommentId = Number(route.params.comment_id);
+const currentPostId = Number(route.params.post_id);
+const currentComment = ref<PostComment | null>(null);
 const parentComment = ref<PostComment | null>(null);
+const replies = ref<PostComment[] | null>(null);
 
 onMounted(async () => {
-  window.scrollTo(0, 0);
-
-  if (postStore.currentComment) {
-    comment.value = postStore.currentComment;
-  } else {
-    try {
-      const data = await PostUtils.singleComment(Number(route.params.id));
-      comment.value = data;
-    } catch (error) {
-      throw error;
+  try {
+    //Current comment
+    if (!currentComment.value) {
+      currentComment.value = await PostUtils.singleComment(currentCommentId);
+      commentStore.addComment(currentComment.value, currentPostId);
     }
+
+    //Parent comment
+    parentComment.value =
+      commentStore.comments[currentPostId][
+        currentComment.value.parent_id as number
+      ];
+
+    if (currentComment.value && !parentComment.value) {
+      parentComment.value = await PostUtils.singleComment(
+        currentComment.value.parent_id as number,
+      );
+      commentStore.addComment(parentComment.value, currentPostId);
+    }
+
+    //Replies
+    replies.value =
+      commentStore.comments[currentPostId][currentCommentId].replies;
+    if (replies.value?.length === 0) {
+      replies.value = await PostUtils.loadReplies(currentCommentId);
+      replies.value.forEach((reply) =>
+        commentStore.addComment(reply, reply.post_id),
+      );
+    }
+    commentStore.listenForComments(currentComment.value.post_id);
+  } catch (error) {
+    console.log(error);
   }
-  await getParentComment();
-  await loadComments();
 });
-
-const getParentComment = async () => {
-  try {
-    const data = await PostUtils.singleComment(
-      Number(comment.value?.parent_id),
-    );
-    parentComment.value = data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-const loadComments = async () => {
-  try {
-    const data = await PostUtils.loadReplies(Number(route.params.id));
-    replies.value = data;
-  } catch (error) {
-    throw error;
-  }
-};
 </script>
 <template>
-  <div class="flex flex-col gap-2">
-    <div class="flex flex-col gap-2">
-      <div>
-        <Comment
-          v-if="comment"
-          :comment="comment"
-          :parent-user="parentComment?.user"
-          :level="0"
-          :nested-main="true"
-          :key="comment.id + $route.fullPath"
-        />
-        <CommentSkeleton v-else />
-      </div>
-      <div class="ml-3 flex flex-col gap-2">
-        <Comment
-          v-if="replies"
-          v-for="reply in replies"
-          :parent-user="comment?.user"
-          :comment="reply"
-          :level="0"
-          :key="comment?.id + $route.fullPath"
-        />
-        <div v-else>
-          <CommentSkeleton v-for="n in 3" />
-        </div>
-      </div>
+  <div class="flex flex-col gap-1">
+    <div>
+      <Comment
+        v-if="currentComment"
+        :nested-main="true"
+        :comment="currentComment"
+        :parent-user="parentComment?.user"
+      ></Comment>
+    </div>
+    <div class="ml-4 flex flex-col" v-if="replies?.length">
+      <Comment
+        v-if="replies?.length > 0"
+        v-for="(reply, index) in replies"
+        :comment="reply"
+        :level="1"
+        :parent-user="currentComment?.user"
+        :key="reply.id + index"
+      />
     </div>
   </div>
 </template>

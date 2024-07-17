@@ -13,7 +13,7 @@ const handleBackClick = () => {
 };
 </script>
 <template>
-  <div  >
+  <div>
     <div class="w-full">
       <Panel
         toggleable
@@ -61,7 +61,7 @@ const handleBackClick = () => {
 
           <div class="mt-2 flex flex-col gap-6 text-center leading-normal">
             <div
-              class="grid grid-rows-[5fr,1fr] place-items-center gap-1 md:grid-rows-[1fr,1fr,1fr]"
+              class="grid grid-rows-[5fr,1fr] place-items-center gap-1 md:grid-rows-[10fr,1fr]"
             >
               <Skeleton width="15rem"> </Skeleton>
               <Skeleton width="10rem"> </Skeleton>
