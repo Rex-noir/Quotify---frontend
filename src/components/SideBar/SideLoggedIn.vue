@@ -40,7 +40,7 @@ const prefStore = usePrefStore();
 </template>
 <style scoped>
 .btn-div {
-  @apply grid w-full cursor-pointer grid-cols-[30px,1fr] items-center gap-2 rounded-lg p-3 hover:bg-surface-100 dark:hover:bg-highlight-emphasis;
+  @apply grid w-full cursor-pointer grid-cols-[30px,1fr] items-center gap-2 rounded-lg p-3 hover:bg-surface-200 dark:hover:bg-highlight-emphasis;
 }
 .icon-div {
   @apply w-fit rounded-full border border-primary-emphasis p-2 text-center;
