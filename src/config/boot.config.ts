@@ -3,6 +3,9 @@ import api from "./api.config";
 import { csrf } from "@/utils/auth.utils";
 import usePrefStore from "@/stores/preferences.store";
 
+//config import
+import "./echo.config";
+
 async function boot() {
   usePrefStore().loadUserPref();
   await csrf();
