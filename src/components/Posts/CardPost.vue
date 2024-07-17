@@ -4,7 +4,6 @@ import Panel from "primevue/panel";
 import Avatar from "primevue/avatar";
 import PostActions from "./PostActionsBar.vue";
 import dayjs from "dayjs";
-import usePostStore from "@/stores/posts.store";
 import { useRoute, useRouter } from "vue-router";
 import useHomeViews from "@/stores/homeviews.store";
 import { HomeViewsEnum } from "@/types/Views/homeviews.type";
@@ -14,12 +13,11 @@ const router = useRouter();
 const route = useRoute();
 
 const props = defineProps<{ post: Post }>();
-const postStore = usePostStore();
 const homeView = useHomeViews();
 
 const handleBackClick = () => {
   homeView.setView(HomeViewsEnum.POSTS);
-  router.push({ name: "home" });
+  router.go(-1);
 };
 
 const viewPost = () => {

@@ -113,12 +113,7 @@ const saveScrollPosition = () => {
           <div v-if="nestedMain">
             <Button
               icon="pi pi-arrow-left"
-              @click="
-                $router.push({
-                  name: 'viewQuote',
-                  params: { id: comment.post_id },
-                })
-              "
+              @click="$router.go(-1)"
               class="prose border-none bg-inherit p-0 dark:prose-invert"
             />
           </div>
