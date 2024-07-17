@@ -5,6 +5,7 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import Comment from "@/components/Comment/Comment.vue";
 import type { PostComment } from "@/types/Post/post.types";
+import CommentSkeleton from "@/components/Comment/CommentSkeleton.vue";
 
 const route = useRoute();
 const commentStore = useCommentStore();
@@ -59,16 +60,18 @@ onMounted(async () => {
         :comment="currentComment"
         :parent-user="parentComment?.user"
       ></Comment>
+      <CommentSkeleton v-else />
     </div>
-    <div class="ml-4 flex flex-col" v-if="replies?.length">
+    <div class="ml-4 flex flex-col">
       <Comment
-        v-if="replies?.length > 0"
+        v-if="replies?.length && replies?.length > 0"
         v-for="(reply, index) in replies"
         :comment="reply"
         :level="1"
         :parent-user="currentComment?.user"
         :key="reply.id + index"
       />
+      <CommentSkeleton v-for="n in 2" v-else />
     </div>
   </div>
 </template>
