@@ -8,4 +8,16 @@ const api = axios.create({
   },
   withXSRFToken: true,
 });
+
+api.interceptors.request.use(
+  (config) => {
+    const socketId = window.Echo.socketId();
+    if (socketId) {
+      config.headers["X-Socket-ID"] = socketId;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
 export default api;
