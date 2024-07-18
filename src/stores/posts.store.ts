@@ -15,7 +15,9 @@ const usePostStore = defineStore("post", () => {
   const userStore = useUserStore();
 
   function addPost(post: Post) {
-    posts.value?.push(post);
+    if (!posts.value.some((p) => p.id === post.id)) {
+      posts.value.push(post);
+    }
   }
 
   function startListeningForUpdates() {
@@ -25,7 +27,6 @@ const usePostStore = defineStore("post", () => {
       })
       .listen("PostUpdated", (e: { updates: Post }) => {
         updatePost(e.updates);
-        console.log("PostUpdated event received:", e);
       })
       .listen(
         "LikeDislikeClicked",
