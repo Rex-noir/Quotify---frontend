@@ -5,13 +5,11 @@ import {
 } from "@/types/Post/post.types";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import useCommentStore from "./comments.store";
 import useUserStore from "./user.store";
 
 const usePostStore = defineStore("post", () => {
   const scrollPosition = ref<number | null>(null);
   const posts = ref<Post[]>([]);
-  const commentStore = useCommentStore();
   const userStore = useUserStore();
 
   function addPost(post: Post) {
@@ -22,9 +20,6 @@ const usePostStore = defineStore("post", () => {
 
   function startListeningForUpdates() {
     window.Echo.channel("posts")
-      .listen("CommentAdded", (e: { comment: PostComment }) => {
-        commentStore.addComment(e.comment, e.comment.post_id);
-      })
       .listen("PostUpdated", (e: { updates: Post }) => {
         updatePost(e.updates);
       })
@@ -50,8 +45,8 @@ const usePostStore = defineStore("post", () => {
 
   function stopListeningForUpdates() {
     window.Echo.channel("post")
-      .stopListening("CommentAdded")
-      .stopListening("PostUpdated");
+      .stopListening("PostUpdated")
+      .stopListening("LikeDislikeClicked");
   }
 
   function updatePost(update: Post) {
