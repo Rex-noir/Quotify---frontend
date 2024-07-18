@@ -68,4 +68,13 @@ export default class PostUtils {
       throw error;
     }
   }
+
+  static async reactComment(commentId: number, reaction: Reactions) {
+    try {
+      const response = await api.post(`/comments/${commentId}/${reaction}`);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
