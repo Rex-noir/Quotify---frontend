@@ -1,14 +1,16 @@
-import type { PostComment } from "@/types/Post/post.types";
+import { Reactions, type PostComment } from "@/types/Post/post.types";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import useResponsive from "./responsive.store";
 import { useRouter } from "vue-router";
+import usePostStore from "./posts.store";
+import useUserStore from "./user.store";
 
 const useCommentStore = defineStore("comments", () => {
   const comments = ref<{ [postId: number]: { [id: number]: PostComment } }>([]);
 
   const layout = computed(() => useResponsive().layout);
-
+  const postsStore = usePostStore();
   const router = useRouter();
 
   const nestedLimit = computed(() => {
@@ -23,6 +25,9 @@ const useCommentStore = defineStore("comments", () => {
   });
 
   function addComment(newComment: PostComment, postId: number) {
+    if (!postsStore.posts.find((post) => post.id === postId)) {
+      return;
+    }
     if (!comments.value[postId]) {
       comments.value[postId] = {};
     }
@@ -67,18 +72,92 @@ const useCommentStore = defineStore("comments", () => {
     }
   }
 
+  function toggleReaction(
+    id: number,
+    post_id: number,
+    reaction: Reactions,
+    to?: boolean,
+  ) {
+    if (useUserStore().status) {
+      const comment = comments.value[post_id][id];
+      if (comment) {
+        //If the reaction is LIKE
+        if (reaction === Reactions.LIKE) {
+          const newIsLikedByUser = to || !comment.is_liked_by_user;
+          if (newIsLikedByUser) {
+            if (!comment.is_liked_by_user) {
+              comment.is_liked_by_user = true;
+              if (!to) comment.likes_count++;
+            }
+
+            if (comment.is_disliked_by_user) {
+              comment.is_disliked_by_user = false;
+              if (!to) comment.dislikes_count--;
+            }
+          } else {
+            if (comment.is_liked_by_user) {
+              comment.is_liked_by_user = false;
+              if (!to) comment.likes_count--;
+            }
+          }
+        }
+
+        //If the reaction is DISLIKE
+        if (reaction === Reactions.DISLIKE) {
+          const newIsDislikedByUser = to || !comment.is_disliked_by_user;
+          if (newIsDislikedByUser) {
+            if (!comment.is_disliked_by_user) {
+              comment.is_disliked_by_user = true;
+              if (!to) comment.dislikes_count++;
+            }
+            if (comment.is_liked_by_user) {
+              comment.is_liked_by_user = false;
+              if (!to) comment.likes_count--;
+            }
+          } else {
+            if (comment.is_disliked_by_user) {
+              comment.is_disliked_by_user = false;
+              if (!to) comment.dislikes_count--;
+            }
+          }
+        }
+      } else {
+        console.warn("Comment id with ", id, "could not be found.");
+      }
+    } else {
+      console.warn("User must be logged in!");
+    }
+  }
+
+  function updateComment(updates: Partial<PostComment>) {
+    if (
+      comments.value[updates.post_id as number] &&
+      comments.value[updates.post_id as number][updates.id as number]
+    ) {
+      const comment =
+        comments.value[updates.post_id as number][updates.id as number];
+      comments.value[updates.post_id as number][updates.id as number] = {
+        ...comment,
+        ...updates,
+      };
+    } else {
+      console.warn("Comment to update is not found");
+    }
+  }
+
   function getComment(postId: number, commentId: number) {
     return comments.value[postId][commentId];
   }
 
-  function listenForComments(post_id: number) {
-    window.Echo.channel(`posts`).listen(
-      `CommentAdded`,
-      (e: { comment: PostComment }) => {
+  function startListeningForComments() {
+    window.Echo.channel(`comments`)
+      .listen(`CommentAdded`, (e: { comment: PostComment }) => {
         addComment(e.comment, e.comment.post_id);
+      })
+      .listen("CommentUpdated", (e: { updates: Partial<PostComment> }) => {
         console.log(e);
-      },
-    );
+        updateComment(e.updates);
+      });
   }
 
   function clearComments(postId?: number) {
@@ -89,17 +168,19 @@ const useCommentStore = defineStore("comments", () => {
     }
   }
 
-  function stopListeningForComments(post_id: number) {
-    window.Echo.channel(`post.${post_id}`).stopListening("CommentAdded");
+  function stopListeningForComments() {
+    window.Echo.channel(`comments`).stopListening("CommentAdded");
   }
   return {
     comments,
     addComment,
-    listenForComments,
+    startListeningForComments,
     stopListeningForComments,
     clearComments,
     getComment,
     nestedLimit,
+    toggleReaction,
+    updateComment,
   };
 });
 
