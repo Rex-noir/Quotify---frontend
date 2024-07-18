@@ -1,5 +1,5 @@
 import api from "@/config/api.config";
-import type { Post, PostComment } from "@/types/Post/post.types";
+import type { Post, PostComment, Reactions } from "@/types/Post/post.types";
 import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
 
 export default class PostUtils {
@@ -54,6 +54,15 @@ export default class PostUtils {
         post_id: data.postId,
         parent_id: data.parentId,
       });
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async react(postId: number, reaction: Reactions) {
+    try {
+      const response = await api.post(`/posts/${postId}/${reaction}`);
       return response;
     } catch (error) {
       throw error;
