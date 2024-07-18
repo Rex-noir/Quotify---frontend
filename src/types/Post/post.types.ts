@@ -15,7 +15,7 @@ export interface Post {
   likes_count: number;
   dislikes_count: number;
   comments_count: number;
-  is_liked_by_user: boolean;
+  is_liked_by_user?: boolean;
   is_disliked_by_user?: boolean;
 }
 
@@ -53,6 +53,8 @@ export interface PostComment {
   replies_count: number;
   level: number;
   replies: PostComment[] | null;
+  is_liked_by_user?: boolean;
+  is_disliked_by_user?: boolean;
 }
 
 export enum Reactions {
