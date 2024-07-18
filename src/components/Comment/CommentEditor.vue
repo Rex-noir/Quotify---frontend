@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import Textarea from "primevue/textarea";
-import { onActivated, onMounted, ref } from "vue";
+import { ref } from "vue";
 import Spinner from "../Spinner.vue";
 import useUserStore from "@/stores/user.store";
 import PostUtils from "@/utils/post.utils";
 import { useToast } from "primevue/usetoast";
 import type { PostComment } from "@/types/Post/post.types";
 import Chip from "primevue/chip";
+import useCommentStore from "@/stores/comments.store";
 
 const props = defineProps<{ postId: number; parentComment?: PostComment }>();
-const emits = defineEmits<{ commentSuccess: [] }>();
 
 const commentBody = ref<string>("");
 const loading = ref(false);
 const userStore = useUserStore();
+const commentStore = useCommentStore();
 const toast = useToast();
 
 const comment = async () => {
@@ -29,9 +30,7 @@ const comment = async () => {
         parentId: props.parentComment?.id,
       });
       commentBody.value = "";
-      loading.value = false;
       if (response.status === 201) {
-        emits("commentSuccess");
       }
     } catch (error) {
       loading.value = false;
@@ -45,6 +44,12 @@ const comment = async () => {
     });
   }
 };
+
+commentStore.$onAction(({ name }) => {
+  if (name === "addComment") {
+    loading.value = false;
+  }
+});
 </script>
 <template>
   <div class="prose flex max-w-none flex-col gap-2 p-1 dark:prose-invert">

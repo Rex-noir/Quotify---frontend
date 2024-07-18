@@ -155,11 +155,7 @@ const saveScrollPosition = () => {
         />
       </div>
       <div v-if="showReplyEditor" class="p-3">
-        <CommentEditor
-          @comment-success="showReplyEditor = false"
-          :post-id="comment.post_id"
-          :parent-comment="comment"
-        />
+        <CommentEditor :post-id="comment.post_id" :parent-comment="comment" />
       </div>
       <div
         v-if="showViewMoreReplies"
