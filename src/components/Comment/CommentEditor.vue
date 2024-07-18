@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Textarea from "primevue/textarea";
-import { ref } from "vue";
+import { onActivated, onMounted, ref, watch } from "vue";
 import Spinner from "../Spinner.vue";
 import useUserStore from "@/stores/user.store";
 import PostUtils from "@/utils/post.utils";
@@ -15,7 +15,16 @@ const commentBody = ref<string>("");
 const loading = ref(false);
 const userStore = useUserStore();
 const commentStore = useCommentStore();
+
 const toast = useToast();
+
+watch(
+  commentStore.addComment,
+  (newCommentStore) => {
+    loading.value = false;
+  },
+  { deep: true },
+);
 
 const comment = async () => {
   if (commentBody.value.trim() === "") {
@@ -44,12 +53,6 @@ const comment = async () => {
     });
   }
 };
-
-commentStore.$onAction(({ name }) => {
-  if (name === "addComment") {
-    loading.value = false;
-  }
-});
 </script>
 <template>
   <div class="prose flex max-w-none flex-col gap-2 p-1 dark:prose-invert">
