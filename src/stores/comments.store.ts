@@ -56,6 +56,7 @@ const useCommentStore = defineStore("comments", () => {
         if (!parentComment.replies.some((r) => r.id === newComment.id)) {
           newComment.level = (parentComment.level || 0) + 1;
           parentComment.replies.push(newComment);
+          parentComment.replies_count++;
 
           if (newComment.level > nestedLimit.value) {
             newComment.level = 0;
@@ -130,19 +131,17 @@ const useCommentStore = defineStore("comments", () => {
   }
 
   function updateComment(updates: Partial<PostComment>) {
-    if (
-      comments.value[updates.post_id as number] &&
-      comments.value[updates.post_id as number][updates.id as number]
-    ) {
-      const comment =
-        comments.value[updates.post_id as number][updates.id as number];
-      comments.value[updates.post_id as number][updates.id as number] = {
-        ...comment,
-        ...updates,
-      };
-    } else {
-      console.warn("Comment to update is not found");
-    }
+    if (updates.post_id && updates.id) {
+      if (comments.value[updates.post_id][updates.id]) {
+        const comment = getComment(updates.post_id, updates.id);
+        comments.value[updates.post_id][updates.id] = {
+          ...comment,
+          ...updates,
+        };
+      } else {
+        console.warn("Comment to update is not found");
+      }
+    } else console.warn("Invalid comment updates received!");
   }
 
   function getComment(postId: number, commentId: number) {
@@ -152,12 +151,28 @@ const useCommentStore = defineStore("comments", () => {
   function startListeningForComments() {
     window.Echo.channel(`comments`)
       .listen(`CommentAdded`, (e: { comment: PostComment }) => {
-        addComment(e.comment, e.comment.post_id);
+        addNewCommentsFromSocket(e.comment);
       })
       .listen("CommentUpdated", (e: { updates: Partial<PostComment> }) => {
-        console.log(e);
         updateComment(e.updates);
       });
+  }
+
+  function addNewCommentsFromSocket(comment: PostComment) {
+    if (!comment.parent_id) {
+      addComment(comment, comment.post_id);
+    }
+    if (comment.parent_id) {
+      const parentComment = getComment(comment.post_id, comment.parent_id);
+      if (
+        parentComment &&
+        parentComment.replies &&
+        parentComment.replies.length > 0
+      ) {
+        addComment(comment, comment.post_id);
+        console.log("Comment added");
+      }
+    }
   }
 
   function clearComments(postId?: number) {
