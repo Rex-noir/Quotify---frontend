@@ -10,6 +10,7 @@ import Chip from "primevue/chip";
 import useCommentStore from "@/stores/comments.store";
 
 const props = defineProps<{ postId: number; parentComment?: PostComment }>();
+const emits = defineEmits<{ success: [] }>();
 
 const commentBody = ref<string>("");
 const loading = ref(false);
@@ -17,14 +18,6 @@ const userStore = useUserStore();
 const commentStore = useCommentStore();
 
 const toast = useToast();
-
-watch(
-  commentStore.addComment,
-  (newCommentStore) => {
-    loading.value = false;
-  },
-  { deep: true },
-);
 
 const comment = async () => {
   if (commentBody.value.trim() === "") {
@@ -39,8 +32,11 @@ const comment = async () => {
         parentId: props.parentComment?.id,
       });
       commentBody.value = "";
-      if (response.status === 201) {
+      if (response.status === 200) {
+        commentStore.addComment(response.data.comment, props.postId);
+        emits("success");
       }
+      loading.value = false;
     } catch (error) {
       loading.value = false;
     }
