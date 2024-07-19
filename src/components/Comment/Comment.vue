@@ -22,21 +22,19 @@ const props = defineProps<{
 }>();
 
 const commentStore = useCommentStore();
-const currentComment = ref(
-  commentStore.comments[props.comment.post_id][props.comment.id],
-);
+
 const commentLoaded = ref<boolean>(false);
 
 const showViewMoreReplies = computed(() => {
   return (
-    (currentComment.value.replies_count &&
-      (currentComment.value.replies_count as number) > 0 &&
-      currentComment.value.replies?.length !==
-        currentComment.value.replies_count &&
+    (props.comment.replies_count &&
+      (props.comment.replies_count as number) > 0 &&
+      props.comment.replies?.length !==
+        props.comment.replies_count &&
       !props.nestedMain &&
       !commentLoaded.value) ||
-    (currentComment.value.level + 1 >= limit &&
-      currentComment.value.replies_count > 0 &&
+    (props.comment.level + 1 >= limit &&
+      props.comment.replies_count > 0 &&
       !props.nestedMain &&
       !commentLoaded.value)
   );
@@ -57,7 +55,7 @@ const colorPalette = [
 ];
 
 const borderColors = computed(() => {
-  return colorPalette[currentComment.value.level % colorPalette.length];
+  return colorPalette[props.comment.level % colorPalette.length];
 });
 
 const loadReplies = async () => {
@@ -76,7 +74,7 @@ const loadReplies = async () => {
 
 const handleLoadingMore = async () => {
   saveScrollPosition();
-  if (currentComment.value.level >= limit) {
+  if (props.comment.level >= limit) {
     router.push({
       name: "Replies",
       params: { comment_id: props.comment.id, post_id: props.comment.post_id },
@@ -90,6 +88,8 @@ const handleLoadingMore = async () => {
 const saveScrollPosition = () => {
   usePostStore().setScrollPosition(window.scrollY);
 };
+
+const commentAdded = ref(false);
 </script>
 <template>
   <div
@@ -155,7 +155,11 @@ const saveScrollPosition = () => {
         />
       </div>
       <div v-if="showReplyEditor" class="p-3">
-        <CommentEditor :post-id="comment.post_id" :parent-comment="comment" />
+        <CommentEditor
+          @success="commentAdded = true"
+          :post-id="comment.post_id"
+          :parent-comment="comment"
+        />
       </div>
       <div
         v-if="showViewMoreReplies"
@@ -165,7 +169,11 @@ const saveScrollPosition = () => {
           v-if="!commentsLoading"
           @click="handleLoadingMore"
           class="h-5 cursor-pointer hover:text-purple-300"
-          >{{ `View ${comment.replies_count} replies` }}</span
+          >{{
+            commentAdded
+              ? "View other replies"
+              : `View ${comment.replies_count} comments`
+          }}</span
         >
         <svg
           v-if="commentsLoading"
@@ -187,14 +195,10 @@ const saveScrollPosition = () => {
           ></path>
         </svg>
       </div>
-      <div
-        class="ml-4 flex flex-col"
-        v-if="
-          currentComment.replies && currentComment.level < limit && !nestedMain
-        "
-      >
+      <div class="ml-4 flex flex-col">
         <Comment
-          v-for="reply in currentComment.replies"
+          v-for="reply in comment.replies"
+          v-if="comment.level < limit && !nestedMain"
           :key="reply.id"
           :parent-user="comment.user"
           :comment="reply"
