@@ -27,10 +27,10 @@ onUnmounted(() => {
       class="fixed z-50 w-full bg-surface-100 dark:bg-surface-0 lg:hidden"
     />
     <HeaderLarge
-      class="fixed z-50 hidden w-full bg-surface-100 dark:bg-surface-0 lg:grid"
+      class="fixed z-50 hidden w-full bg-surface-100 dark:bg-surface-0 md:p-3 lg:grid"
     />
     <div
-      class="relative top-[7rem] grid md:top-[3.6rem] md:grid-cols-3 lg:top-20 lg:grid-cols-[1fr,1.5fr,1fr]"
+      class="relative top-[7rem] grid md:top-[3.6rem] md:grid-cols-3 lg:top-16 lg:grid-cols-[1fr,1.5fr,1fr]"
     >
       <div class="hidden h-full w-full lg:col-start-1 lg:block">
         <component v-if="userStore.status" :is="SideLoggedIn" />
