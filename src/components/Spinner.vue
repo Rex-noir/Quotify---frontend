@@ -3,16 +3,52 @@ const props = defineProps<{ color: string }>();
 </script>
 <template>
   <div>
-    <svg class="mr-3 h-5 w-5 animate-spin" viewBox="0 0 24 24">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle :fill="color" class="spinner_qM83" cx="4" cy="12" r="3" />
       <circle
-        class="opacity-25"
+        :fill="color"
+        class="spinner_qM83 spinner_oXPr"
         cx="12"
         cy="12"
-        r="10"
-        :stroke="color"
-        stroke-width="4"
-      ></circle>
-      <path class="opacity-75" :fill="color" d="M4 12a8 8 0 018-8v8H4z"></path>
+        r="3"
+      />
+      <circle
+        :fill="color"
+        class="spinner_qM83 spinner_ZTLf"
+        cx="20"
+        cy="12"
+        r="3"
+      />
     </svg>
   </div>
 </template>
+<style scoped>
+.spinner_qM83 {
+  animation: spinner_8HQG 1.05s infinite;
+}
+.spinner_oXPr {
+  animation-delay: 0.1s;
+}
+.spinner_ZTLf {
+  animation-delay: 0.2s;
+}
+@keyframes spinner_8HQG {
+  0%,
+  57.14% {
+    animation-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+    transform: translate(0);
+  }
+  28.57% {
+    animation-timing-function: cubic-bezier(0.33, 0, 0.66, 0.33);
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+</style>
