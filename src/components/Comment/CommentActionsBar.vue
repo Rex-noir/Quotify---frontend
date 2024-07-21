@@ -63,49 +63,52 @@ const debounceReact = debounce(async (reaction: Reactions) => {
 </script>
 <template>
   <div
-    class="prose grid w-full max-w-none grid-cols-4 place-items-center gap-2 dark:prose-invert"
+    class="prose flex max-w-none place-items-center gap-2 text-sm dark:prose-invert"
   >
-    <div
-      v-ripple
-      @click="handleClick(CommentBarActions.LIKE)"
-      class="action-container"
-      :class="[{ 'text-teal-500': comment?.is_liked_by_user }]"
-    >
+    <div class="action-container">
       <span>{{ comment?.likes_count ? comment?.likes_count : "0" }}</span>
-      <span class="pi pi-thumbs-up" aria-label="Like" />
-    </div>
-    <div
-      @click="handleClick(CommentBarActions.DISLIKE)"
-      v-ripple
-      class="action-container"
-      :class="[{ 'text-blue-500': comment?.is_disliked_by_user }]"
-    >
-      <span>{{ comment?.dislikes_count ? comment?.dislikes_count : "0" }}</span>
-      <span class="pi pi-thumbs-down" aria-label="Dislike" />
-    </div>
-    <div
-      @click="handleClick(CommentBarActions.COMMENT)"
-      v-ripple
-      class="action-container"
-    >
       <span
-        class="prose dark:prose-invert"
+        :class="[{ 'text-teal-500': comment?.is_liked_by_user }]"
+        @click="handleClick(CommentBarActions.LIKE)"
+        aria-label="Like"
+        class="action-text"
+        >{{ comment.likes_count > 1 ? "Likes" : "Like" }}</span
+      >
+    </div>
+    <div class="action-container">
+      <span>{{ comment?.dislikes_count ? comment?.dislikes_count : "0" }}</span>
+      <span
+        class="action-text"
+        @click="handleClick(CommentBarActions.DISLIKE)"
+        aria-label="Dislike"
+        :class="[{ 'text-blue-500': comment?.is_disliked_by_user }]"
+        >{{ comment.dislikes_count > 1 ? "Dislikes" : "Dislike" }}</span
+      >
+    </div>
+    <div class="action-container">
+      <span
+        class="action-text"
+        @click="handleClick(CommentBarActions.COMMENT)"
         :aria-label="commentEditorCollapsed ? 'Close' : 'Reply'"
         >{{ commentEditorCollapsed ? "Close" : "Reply" }}</span
       >
     </div>
-    <div
-      @click="handleClick(CommentBarActions.SHARE)"
-      v-ripple
-      class="action-container h-full"
-    >
-      <span class="pi pi-bookmark" aria-label="Share" />
+    <div class="action-container h-full">
+      <span
+        class="action-text"
+        @click="handleClick(CommentBarActions.SHARE)"
+        aria-label="Share"
+        >Share</span
+      >
     </div>
   </div>
 </template>
 <style scoped>
 .action-container {
-  @apply flex w-full cursor-pointer items-center justify-center gap-3 py-2;
+  @apply flex cursor-pointer items-center justify-center gap-1;
+}
+.action-text {
+  @apply hover:text-slate-400 active:text-slate-700;
 }
 </style>
 ,
