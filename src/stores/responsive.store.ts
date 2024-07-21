@@ -9,8 +9,8 @@ const useResponsive = defineStore("responsive", () => {
 
     if (width <= 425) {
       layout.value = "mobile"; // Layout for max 425px
-    } else if (width <= 768) {
-      layout.value = "tablet"; // Layout for max 768px
+    } else if (width < 1024) {
+      layout.value = "tablet"; // Layout for max 1023px
     } else {
       layout.value = "desktop"; // Layout for anything larger
     }

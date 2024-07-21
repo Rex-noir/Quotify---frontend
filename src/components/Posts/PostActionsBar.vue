@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import usePostStore from "@/stores/posts.store";
+import useResponsive from "@/stores/responsive.store";
 import useUserStore from "@/stores/user.store";
 import { PostBarActions, Reactions, type Post } from "@/types/Post/post.types";
 import PostUtils from "@/utils/post.utils";
 import { debounce } from "@/utils/utils";
 import { useToast } from "primevue/usetoast";
 import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 const props = defineProps<{
   post: Post;
@@ -18,9 +19,9 @@ const post = computed(() =>
 );
 
 const toast = useToast();
-const router = useRouter();
-
+const responsive = useResponsive();
 const userStore = useUserStore();
+const route = useRoute();
 
 const handleClick = async (action: PostBarActions) => {
   if (!userStore.status && action !== PostBarActions.COMMENT) {
@@ -30,23 +31,26 @@ const handleClick = async (action: PostBarActions) => {
       life: 1000,
     });
   } else {
-    switch (action) {
-      case PostBarActions.COMMENT:
-        router.push({
-          name: "viewQuote",
-          params: { id: props?.post.id },
-        });
-        break;
+    if (post.value) {
+      switch (action) {
+        case PostBarActions.COMMENT:
+          if (responsive.layout !== "desktop") {
+            postStore.viewPost(post.value.id);
+          } else if (route.name !== "viewQuote") {
+            postStore.toggleModal(true);
+          }
+          break;
 
-      case PostBarActions.LIKE:
-        postStore.toggleReaction(props.post.id, Reactions.LIKE);
-        debounceReact(Reactions.LIKE);
-        break;
+        case PostBarActions.LIKE:
+          postStore.toggleReaction(props.post.id, Reactions.LIKE);
+          debounceReact(Reactions.LIKE);
+          break;
 
-      case PostBarActions.DISLIKE:
-        postStore.toggleReaction(props.post.id, Reactions.DISLIKE);
-        debounceReact(Reactions.DISLIKE);
-        break;
+        case PostBarActions.DISLIKE:
+          postStore.toggleReaction(props.post.id, Reactions.DISLIKE);
+          debounceReact(Reactions.DISLIKE);
+          break;
+      }
     }
   }
 };
