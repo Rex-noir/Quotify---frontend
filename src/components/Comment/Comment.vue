@@ -6,14 +6,17 @@ import CommentActionBar from "@/components/Comment/CommentActionsBar.vue";
 import Panel from "primevue/panel";
 import { computed, ref } from "vue";
 import PostUtils from "@/utils/post.utils";
-import Chip from "primevue/chip";
 import type { User } from "@/types/User/user.types";
 import usePostStore from "@/stores/posts.store";
 import { useRouter } from "vue-router";
 import Button from "primevue/button";
-import CommentEditor from "./CommentEditor.vue";
+import Spinner from "../Spinner.vue";
 import useCommentStore from "@/stores/comments.store";
+import relativeTime from "dayjs/plugin/relativeTime";
+import CommentEditor from "./CommentEditor.vue";
+import { formatTextWithMentions } from "@/utils/utils";
 
+dayjs.extend(relativeTime);
 const commentsLoading = ref(false);
 const props = defineProps<{
   comment: PostComment;
@@ -29,8 +32,7 @@ const showViewMoreReplies = computed(() => {
   return (
     (props.comment.replies_count &&
       (props.comment.replies_count as number) > 0 &&
-      props.comment.replies?.length !==
-        props.comment.replies_count &&
+      props.comment.replies?.length !== props.comment.replies_count &&
       !props.nestedMain &&
       !commentLoaded.value) ||
     (props.comment.level + 1 >= limit &&
@@ -47,11 +49,11 @@ const showReplyEditor = ref(false);
 const limit = commentStore.nestedLimit;
 
 const colorPalette = [
-  "border-green-600", // Level 0
-  "border-blue-300", // Level 1
-  "border-amber-400", // Level 2
-  "border-purple-400", // Level 3
-  "border-lime-400", // Level 4
+  "before:border-green-600", // Level 0
+  "before:border-blue-300", // Level 1
+  "before:border-amber-400", // Level 2
+  "before:border-purple-400", // Level 3
+  "before:border-lime-400", // Level 4
 ];
 
 const borderColors = computed(() => {
@@ -90,16 +92,27 @@ const saveScrollPosition = () => {
 };
 
 const commentAdded = ref(false);
+
+const formattedComment = computed(() => {
+  const mentionRegex = new RegExp(`@(${props.parentUser?.name})`, "g");
+  const formattedText = formatTextWithMentions(
+    props.comment.content,
+    mentionRegex,
+  );
+  return formattedText;
+});
 </script>
 <template>
   <div
-    class="comment relative flex h-full w-full flex-col gap-3 bg-none dark:bg-inherit"
+    class="comment-wrapper relative flex h-full flex-col gap-3 bg-none dark:bg-inherit"
   >
     <Panel
-      :class="borderColors"
       toggleable
-      class="comment-parent rounded-none border-b-0 border-l-0 border-r-0 border-t-0 dark:bg-[#2d2a2a]"
+      :id="comment.id"
+      class="comment-parent relative rounded-lg border-b-0 border-l-0 border-r-0 border-t-0 dark:bg-[#2d2a2a]"
     >
+      <a :href="`#${comment.id}`" :class="borderColors" class="line-down"></a>
+
       <template #toggleicon="{ collapsed }">
         <div class="">
           <span
@@ -117,25 +130,24 @@ const commentAdded = ref(false);
               class="prose border-none bg-inherit p-0 dark:prose-invert"
             />
           </div>
+
           <Avatar
             :label="comment?.user.name.charAt(0)"
-            ass="mr-2"
+            class="border bg-inherit"
             shape="circle"
             size="small"
           />
-          <div class="flex flex-col">
-            <span class="prose font-semibold leading-none dark:prose-invert"
+          <div class="prose flex flex-col leading-none dark:prose-invert">
+            <span class="font-semibold"
               >@{{ comment?.user.name ? comment.user.name : "username" }}</span
             >
-            <span class="prose prose-sm dark:prose-invert">{{
-              comment?.created_at
-                ? dayjs(comment.created_at).format("DD-MM-YYYY h:mm a")
-                : "1 second ago"
+            <span class="text-sm">{{
+              dayjs(comment.created_at).fromNow()
             }}</span>
           </div>
         </div>
       </template>
-      <div
+      <!-- <div
         v-if="parentUser"
         class="prose prose-purple p-2 font-bold dark:prose-invert"
       >
@@ -144,59 +156,62 @@ const commentAdded = ref(false);
           :label="`@${parentUser.name}`"
           icon="pi pi-reply"
         />
+      </div> -->
+      <div class="grid grid-cols-[35px,auto]">
+        <div class="relative col-start-1">
+          <div
+            v-if="comment.level !== 0"
+            :class="borderColors"
+            class="line-bend"
+            :href="`#${comment.id}`"
+          ></div>
+        </div>
+        <div class="col-start-2 flex flex-col gap-2">
+          <div
+            class="prose flex w-full max-w-none items-center dark:prose-invert"
+          >
+            <span
+              v-html="formattedComment"
+              class="break-all px-2 leading-tight"
+            ></span>
+          </div>
+
+          <div class="flex h-6 items-center gap-2 px-2 pb-2">
+            <CommentActionBar
+              @reply-clicked="showReplyEditor = !showReplyEditor"
+              :comment="comment"
+            />
+          </div>
+          <div
+            v-if="showViewMoreReplies"
+            :class="borderColors"
+            class="replies-line-connect prose relative flex max-w-none items-center gap-2 pl-2 text-sm dark:prose-invert"
+          >
+            <span
+              v-if="!commentsLoading"
+              @click="handleLoadingMore"
+              class="cursor-pointer hover:text-purple-300"
+              >{{
+                commentAdded
+                  ? "View other replies"
+                  : `View ${comment.replies_count} replies`
+              }}</span
+            >
+            <Spinner v-if="commentsLoading" color="gray" />
+          </div>
+        </div>
+        <div v-if="showReplyEditor" class="col-start-2 p-3">
+          <CommentEditor
+            @success="commentAdded = true"
+            :post-id="comment.post_id"
+            :parent-comment="comment"
+          />
+        </div>
       </div>
-      <div class="prose max-w-none p-2 py-2 leading-tight dark:prose-invert">
-        <p>{{ comment?.content }}</p>
-      </div>
-      <div class="flex">
-        <CommentActionBar
-          @reply-clicked="showReplyEditor = !showReplyEditor"
-          :comment="comment"
-        />
-      </div>
-      <div v-if="showReplyEditor" class="p-3">
-        <CommentEditor
-          @success="commentAdded = true"
-          :post-id="comment.post_id"
-          :parent-comment="comment"
-        />
-      </div>
-      <div
-        v-if="showViewMoreReplies"
-        class="prose flex max-w-none items-center justify-end gap-2 dark:prose-invert"
-      >
-        <span
-          v-if="!commentsLoading"
-          @click="handleLoadingMore"
-          class="h-5 cursor-pointer hover:text-purple-300"
-          >{{
-            commentAdded
-              ? "View other replies"
-              : `View ${comment.replies_count} comments`
-          }}</span
-        >
-        <svg
-          v-if="commentsLoading"
-          class="mr-3 h-5 w-5 animate-spin"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          ></circle>
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v8H4z"
-          ></path>
-        </svg>
-      </div>
-      <div class="ml-4 flex flex-col">
+
+      <div class="ml-8 flex flex-col">
         <Comment
+          class="nested-comment"
           v-for="reply in comment.replies"
           v-if="comment.level < limit && !nestedMain"
           :key="reply.id"
@@ -208,19 +223,20 @@ const commentAdded = ref(false);
   </div>
 </template>
 <style scoped>
-.comment-parent::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  border-left: 1px solid;
-  border-color: inherit;
-  height: 100%;
-  transform: translateX(-50%);
+.line-down {
+  @apply absolute top-8 h-[calc(100%-48px)] w-4;
+  @apply before:absolute before:left-6 before:top-[16px] before:h-full before:border-l before:content-[''];
+  @apply before:pointer-events-none; /* Add this line */
+
+  /* @apply after:absolute after:left-4 after:top-16 after:h-full after:w-4 after:rounded-b-md after:border-b after:border-l; */
 }
-</style>
-<style lang="css">
-.p-chip-icon {
-  @apply prose dark:prose-invert;
+.line-bend {
+  @apply absolute -left-4 -top-12 h-full;
+  @apply before:absolute before:left-1 before:top-3 before:w-5 before:border-b;
+  @apply before:pointer-events-none; /* Add this line */
+}
+.replies-line-connect {
+  @apply before:absolute before:-left-[10px] before:w-4 before:border-b before:content-[''];
+  @apply before:pointer-events-none; /* Add this line */
 }
 </style>

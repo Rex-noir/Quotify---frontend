@@ -1,7 +1,22 @@
 <script setup lang="ts">
 import Skeleton from "primevue/skeleton";
 import Panel from "primevue/panel";
-import CommentActionsBarSkeleton from "./CommentActionBarSkeleton.vue";
+import CommentActionBarSkeleton from "./CommentActionBarSkeleton.vue";
+import { computed } from "vue";
+import useResponsive from "@/stores/responsive.store";
+
+const getRandomWidth = (min: number, max: number) => {
+  return `${Math.floor(Math.random() * (max - min + 1)) + min}rem`;
+};
+
+const responsive = useResponsive();
+
+const skeletonWidths = computed(() => {
+  if (responsive.layout === "mobile") {
+    return getRandomWidth(5, 13);
+  }
+  return getRandomWidth(5, 30);
+});
 </script>
 <template>
   <div>
@@ -16,9 +31,9 @@ import CommentActionsBarSkeleton from "./CommentActionBarSkeleton.vue";
       </template>
 
       <template #header>
-        <div class="mb-4 flex items-center">
-          <Skeleton shape="circle" size="2rem" class="mr-2"></Skeleton>
-          <div class="flex flex-col gap-2">
+        <div class="flex items-center p-2">
+          <Skeleton shape="circle" size="2rem" class="mr-1"></Skeleton>
+          <div class="flex flex-col gap-1">
             <Skeleton width="10rem"></Skeleton>
             <Skeleton width="5rem"></Skeleton>
           </div>
@@ -26,12 +41,11 @@ import CommentActionsBarSkeleton from "./CommentActionBarSkeleton.vue";
       </template>
 
       <div
-        class="prose flex max-w-none flex-col gap-2 p-2 py-2 leading-tight dark:prose-invert"
+        class="prose ml-8 flex max-w-none flex-col gap-2 px-3 leading-tight dark:prose-invert"
       >
-        <Skeleton class="w-full"></Skeleton>
-        <Skeleton class="w-full"></Skeleton>
+        <Skeleton height="25px" :width="skeletonWidths"></Skeleton>
+        <CommentActionBarSkeleton class="py-1" />
       </div>
-      <CommentActionsBarSkeleton />
     </Panel>
   </div>
 </template>

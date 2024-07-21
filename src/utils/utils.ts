@@ -13,3 +13,13 @@ export function debounce<T extends (...args: any[]) => void>(
     }, delay);
   };
 }
+
+export function formatTextWithMentions(
+  text: string,
+  mentionRegex: RegExp,
+): string {
+  return text.replace(
+    mentionRegex,
+    '<span class="bg-sky-200 dark:bg-slate-900 px-1 rounded-md ">@$1</span>',
+  );
+}
