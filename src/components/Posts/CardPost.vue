@@ -8,9 +8,13 @@ import { useRoute, useRouter } from "vue-router";
 import useHomeViews from "@/stores/homeviews.store";
 import { HomeViewsEnum } from "@/types/Views/homeviews.type";
 import Button from "primevue/button";
+import useResponsive from "@/stores/responsive.store";
+import usePostStore from "@/stores/posts.store";
 
 const router = useRouter();
 const route = useRoute();
+const responsive = useResponsive();
+const postStore = usePostStore();
 
 const props = defineProps<{ post: Post }>();
 const homeView = useHomeViews();
@@ -21,11 +25,10 @@ const handleBackClick = () => {
 };
 
 const viewPost = () => {
-  if (route.name !== "viewQuote") {
-    router.push({
-      name: "viewQuote",
-      params: { id: props.post.id },
-    });
+  if (responsive.layout !== "desktop") {
+    postStore.viewPost(props.post.id);
+  } else if (route.name !== "viewQuote") {
+    postStore.toggleModal(true);
   }
 };
 
@@ -41,7 +44,7 @@ const headerClickFilter = (e: Event) => {
     <div class="w-full">
       <Panel
         toggleable
-        class="mb-1 cursor-pointer divide-purple-400 rounded-none border-none bg-surface-100 shadow-md transition-all dark:bg-[#2d2a2a]"
+        class="mb-1 cursor-pointer divide-purple-400 rounded-lg border-none bg-surface-100 shadow-md transition-all dark:bg-[#2d2a2a]"
       >
         <template #toggleicon="{ collapsed }">
           <div class="">
@@ -90,6 +93,7 @@ const headerClickFilter = (e: Event) => {
 
         <div
           v-ripple
+          @click="viewPost"
           class="prose flex max-w-none flex-col gap-5 p-2 dark:prose-invert"
         >
           <span class="text-xl font-semibold leading-tight">
