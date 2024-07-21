@@ -6,7 +6,7 @@ import Button from "primevue/button";
 const { currentView } = useHomeViews();
 </script>
 <template>
-  <div class="grid w-full grid-cols-3">
+  <div class="grid w-full gap-2 grid-cols-3">
     <Button
       outlined
       :class="[
@@ -35,7 +35,7 @@ const { currentView } = useHomeViews();
 </template>
 <style scoped>
 .tab-buttons {
-  @apply w-full rounded-none border-none;
+  @apply w-full rounded-lg border-none;
 }
 .active-tab {
   @apply prose bg-surface-200 dark:prose-invert dark:bg-highlight;

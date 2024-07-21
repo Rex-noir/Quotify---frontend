@@ -8,7 +8,7 @@ import IconField from "primevue/iconfield";
 const searchFocus = ref<boolean>(false);
 </script>
 <template>
-  <div class="grid-cols-[1fr,1.5fr,1fr] items-center border-none py-3">
+  <div class="grid-cols-[1fr,1.5fr,1fr] items-center gap-3 border-none py-3">
     <span class="text-center font-display text-2xl font-bold dark:text-teal-300"
       >Quotify</span
     >
@@ -32,7 +32,7 @@ const searchFocus = ref<boolean>(false);
       </IconField>
       <div
         v-if="searchFocus"
-        class="prose absolute mt-3 h-screen w-full rounded-sm bg-surface-200 p-2 dark:prose-invert dark:bg-[#272626]"
+        class="prose absolute mt-4 h-screen w-full rounded-lg bg-surface-200 p-2 dark:prose-invert dark:bg-[#272626]"
       >
         Search View
       </div>
