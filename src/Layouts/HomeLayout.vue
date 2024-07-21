@@ -30,7 +30,7 @@ onUnmounted(() => {
       class="fixed z-50 hidden w-full bg-surface-100 dark:bg-surface-0 lg:grid"
     />
     <div
-      class="relative top-[7rem] grid md:top-[3.6rem] md:grid-cols-3 lg:top-20 lg:grid-cols-[1fr,1fr,1fr,1fr]"
+      class="relative top-[7rem] grid md:top-[3.6rem] md:grid-cols-3 lg:top-20 lg:grid-cols-[1fr,1.5fr,1fr]"
     >
       <div class="hidden h-full w-full lg:col-start-1 lg:block">
         <component v-if="userStore.status" :is="SideLoggedIn" />
@@ -41,7 +41,7 @@ onUnmounted(() => {
         :is="useHomeViews().currentView"
       /> -->
       <div
-        class="border-l border-r dark:border-surface-700 md:col-span-2 lg:col-span-2 lg:col-start-2"
+        class="dark:border-surface-700 md:col-span-2 md:p-2 lg:col-span-1 lg:col-start-2"
       >
         <router-view v-slot="{ Component }">
           <keep-alive include="PostListView,QuoteView">
@@ -50,7 +50,7 @@ onUnmounted(() => {
         </router-view>
       </div>
       <component
-        class="hidden bg-surface-100 md:fixed md:col-start-3 md:block lg:col-start-4"
+        class="md:top-30 z-10 hidden bg-surface-100 md:sticky md:col-start-3 md:block lg:col-start-3"
         :is="CommunitiesView"
       />
     </div>
