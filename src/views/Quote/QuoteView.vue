@@ -113,8 +113,6 @@ const topLevelComments = computed(() => {
     <CardPostSkeleton v-if="!post"></CardPostSkeleton>
     <CardPost v-if="post" :post="post as Post"></CardPost>
 
-    <CommentEditor v-if="post" :post-id="post.id"></CommentEditor>
-
     <div
       id="commentsContainer"
       class="prose flex max-w-none flex-col gap-3 p-1 dark:prose-invert"
@@ -127,18 +125,22 @@ const topLevelComments = computed(() => {
         :level="0"
         :key="comment.id + index"
       ></Comment>
-      <CommentSkeleton
-        v-if="commentsLoading"
-        :key="'commentsSkeleton'"
-        v-for="n in 1"
-      />
-      <div
-        class="flex flex-col gap-3"
-        v-if="hasMoreComments"
-        id="loaderComments"
-      >
-        <CommentSkeleton :key="'bamboo'" v-for="n in 1" />
+      <div class="flex flex-col gap-3">
+        <CommentSkeleton
+          v-if="commentsLoading"
+          :key="'commentsSkeleton'"
+          v-for="n in 10"
+        />
+        <CommentSkeleton
+          id="loaderComments"
+          v-if="hasMoreComments"
+          :key="'bamboo'"
+          v-for="n in 10"
+        />
       </div>
     </div>
+  </div>
+  <div class="sticky bottom-[0px] px-2 z-10 h-fit">
+    <CommentEditor v-if="post" :post-id="post.id"></CommentEditor>
   </div>
 </template>
