@@ -7,6 +7,6 @@ const items = ref(Array.from({ length: 30 }).map((_, i) => `Community #${i}`));
   <div
     class="prose h-full w-full p-2 dark:prose-invert prose-h2:mb-0 dark:bg-surface-0"
   >
-    hi
+    <div class="sticky top-16">How to dissapear</div>
   </div>
 </template>
