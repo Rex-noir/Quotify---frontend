@@ -7,6 +7,7 @@ import PostUtils from "@/utils/post.utils";
 import CardPostSkeleton from "@/components/Posts/CardPostSkeleton.vue";
 import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
 import usePostStore from "@/stores/posts.store";
+import ModalQuoteView from "@/components/Posts/ModalQuoteView.vue";
 
 const postStore = usePostStore();
 
@@ -46,6 +47,8 @@ const fetchPost = async (url?: string) => {
   }
 };
 
+const postId = ref<number>();
+
 onMounted(async () => {
   await fetchPost();
   const postLoader = document.querySelector("#postsLoader");
@@ -72,6 +75,7 @@ onUnmounted(() => {
           <CardPost
             v-for="(post, index) in slotProp.items"
             :post="post as Post"
+            @click="postId = post.id"
             :key="post.id"
           ></CardPost>
           <div id="postsLoader" v-if="hasMore && posts" class="flex flex-col">
@@ -87,6 +91,7 @@ onUnmounted(() => {
       </template>
     </DataView>
   </main>
+  <ModalQuoteView v-if="postId" :key="Date()" :post-id="postId" />
 </template>
 <style>
 .p-dataview-content {

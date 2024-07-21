@@ -22,3 +22,14 @@ router.afterEach((to) => {
   >
   <component :is="layoutStore.currentLayout" />
 </template>
+<style>
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.html {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+</style>
