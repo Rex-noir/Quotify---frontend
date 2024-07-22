@@ -22,7 +22,7 @@ onUnmounted(() => {
 });
 </script>
 <template>
-  <div class="h-ful relative">
+  <div class="h-full relative">
     <HeaderSmall
       class="fixed z-50 w-full bg-surface-100 dark:bg-surface-0 lg:hidden"
     />
@@ -30,7 +30,7 @@ onUnmounted(() => {
       class="fixed z-50 hidden w-full bg-surface-100 dark:bg-surface-0 md:p-3 lg:grid"
     />
     <div
-      class="relative top-[7rem] grid md:top-[3.6rem] md:grid-cols-3 lg:top-16 lg:grid-cols-[1fr,1.5fr,1fr]"
+      class="relative top-[8rem] grid md:top-[5rem] md:grid-cols-3 lg:top-16 lg:grid-cols-[1fr,1.5fr,1fr]"
     >
       <div class="hidden h-full w-full lg:col-start-1 lg:block">
         <component v-if="userStore.status" :is="SideLoggedIn" />
@@ -41,7 +41,7 @@ onUnmounted(() => {
         :is="useHomeViews().currentView"
       /> -->
       <div
-        class="dark:border-surface-700 md:col-span-2 md:p-2 lg:col-span-1 lg:col-start-2"
+        class="p-2 dark:border-surface-700 md:col-span-2 lg:col-span-1 lg:col-start-2"
       >
         <router-view v-slot="{ Component }">
           <keep-alive include="PostListView,QuoteView">
