@@ -134,7 +134,7 @@ const topLevelComments = computed(() => {
       </div>
     </div>
   </div>
-  <div class="sticky bottom-[0px] z-10 h-fit px-2">
+  <div class="sticky bottom-[1px] z-10 h-fit">
     <CommentEditor v-if="post" :post-id="post.id"></CommentEditor>
   </div>
 </template>
