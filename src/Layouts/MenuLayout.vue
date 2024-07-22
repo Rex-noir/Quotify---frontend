@@ -12,7 +12,7 @@ onMounted(() => {
 </script>
 <template>
   <div>
-    <div class="fixed top-0 z-10 flex w-full items-center justify-between p-2">
+    <div class="fixed top-0 z-10 flex w-full items-center justify-between p-2 px-3">
       <div class="prose flex items-center gap-4 font-bold dark:prose-invert">
         <span
           @click="useLayout.changeLayout(LayoutNames.HOME)"
