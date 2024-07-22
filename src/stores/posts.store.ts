@@ -5,7 +5,6 @@ import useUserStore from "./user.store";
 import { useRoute, useRouter } from "vue-router";
 
 const usePostStore = defineStore("post", () => {
-  const scrollPosition = ref<number | null>(null);
   const posts = ref<Post[]>([]);
   const userStore = useUserStore();
   const showModal = ref<boolean>(false);
@@ -119,10 +118,6 @@ const usePostStore = defineStore("post", () => {
     posts.value = posts.value?.filter((post) => post.id !== postId);
   }
 
-  function setScrollPosition(position: number) {
-    scrollPosition.value = position;
-  }
-
   function viewPost(postId: number) {
     if (route.name !== "viewQuote") {
       router.push({
@@ -133,8 +128,6 @@ const usePostStore = defineStore("post", () => {
   }
 
   return {
-    scrollPosition,
-    setScrollPosition,
     posts,
     addPost,
     startListeningForUpdates,
