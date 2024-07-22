@@ -8,7 +8,9 @@ const useLayout = useLayoutStore();
 </script>
 <template>
   <div class="">
-    <div class="grid grid-cols-3 md:grid-cols-[5fr,1fr,80px]">
+    <div
+      class="grid grid-cols-3 border-none px-2 py-3 md:grid-cols-[5fr,1fr,80px]"
+    >
       <div
         class="col-span-2 col-start-1 flex h-full w-full flex-col justify-center p-2 md:col-start-2 md:items-center"
       >
