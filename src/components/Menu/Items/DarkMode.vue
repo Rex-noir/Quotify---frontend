@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import usePrefStore from "@/stores/preferences.store";
 import ToggleSwitch from "primevue/toggleswitch";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 
 const prefStore = usePrefStore();
 const switchModel = computed(() => prefStore.isDark);
