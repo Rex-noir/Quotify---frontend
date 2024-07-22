@@ -7,7 +7,6 @@ import Panel from "primevue/panel";
 import { computed, ref } from "vue";
 import PostUtils from "@/utils/post.utils";
 import type { User } from "@/types/User/user.types";
-import usePostStore from "@/stores/posts.store";
 import { useRouter } from "vue-router";
 import Button from "primevue/button";
 import Spinner from "../Spinner.vue";
@@ -75,7 +74,6 @@ const loadReplies = async () => {
 };
 
 const handleLoadingMore = async () => {
-  saveScrollPosition();
   if (props.comment.level >= limit) {
     router.push({
       name: "Replies",
@@ -85,10 +83,6 @@ const handleLoadingMore = async () => {
     await loadReplies();
     commentLoaded.value = true;
   }
-};
-
-const saveScrollPosition = () => {
-  usePostStore().setScrollPosition(window.scrollY);
 };
 
 const commentAdded = ref(false);

@@ -1,16 +1,19 @@
-import {
-  Reactions,
-  type Post,
-  type PostComment,
-} from "@/types/Post/post.types";
+import { Reactions, type Post } from "@/types/Post/post.types";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import useUserStore from "./user.store";
+import { useRoute, useRouter } from "vue-router";
 
 const usePostStore = defineStore("post", () => {
-  const scrollPosition = ref<number | null>(null);
   const posts = ref<Post[]>([]);
   const userStore = useUserStore();
+  const showModal = ref<boolean>(false);
+  const route = useRoute();
+  const router = useRouter();
+
+  function toggleModal(bool?: boolean) {
+    showModal.value = bool || !showModal.value;
+  }
 
   function addPost(post: Post) {
     if (!posts.value.some((p) => p.id === post.id)) {
@@ -115,19 +118,23 @@ const usePostStore = defineStore("post", () => {
     posts.value = posts.value?.filter((post) => post.id !== postId);
   }
 
-  function setScrollPosition(position: number) {
-    scrollPosition.value = position;
+  function viewPost(postId: number) {
+    if (route.name !== "viewQuote") {
+      router.push({
+        name: "viewQuote",
+        params: { id: postId },
+      });
+    }
   }
 
   return {
-    scrollPosition,
-    setScrollPosition,
     posts,
     addPost,
     startListeningForUpdates,
     deletePost,
-    // toggleLike,
-    // toggleDisLike,
+    showModal,
+    toggleModal,
+    viewPost,
     toggleReaction,
     stopListeningForUpdates,
   };

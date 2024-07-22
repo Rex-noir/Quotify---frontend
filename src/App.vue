@@ -3,6 +3,7 @@ import useLayoutStore from "./stores/layouts.store";
 import router from "./router";
 import type { LayoutNames } from "./types/Layouts/layouts.types";
 import Toast from "primevue/toast";
+import ProgressBar from "primevue/progressbar";
 
 const layoutStore = useLayoutStore();
 router.afterEach((to) => {
@@ -20,5 +21,24 @@ router.afterEach((to) => {
       </div>
     </template></Toast
   >
-  <component :is="layoutStore.currentLayout" />
+  <div>
+    <ProgressBar
+      v-if="layoutStore.showProgressBar"
+      mode="indeterminate"
+      class="fixed left-0 top-0 z-50 w-full"
+      style="height: 3px"
+    ></ProgressBar>
+    <component :is="layoutStore.currentLayout" />
+  </div>
 </template>
+<style>
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.html {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+</style>

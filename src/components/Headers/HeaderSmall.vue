@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import Button from "primevue/button";
 import HeaderTabs from "./HeaderTabs.vue";
+import useLayoutStore from "@/stores/layouts.store";
+import { LayoutNames } from "@/types/Layouts/layouts.types";
+
+const useLayout = useLayoutStore();
 </script>
 <template>
   <div class="">
-    <div class="grid grid-cols-3 md:grid-cols-[5fr,1fr,80px]">
+    <div
+      class="grid grid-cols-3 border-none px-2 py-3 md:grid-cols-[5fr,1fr,80px]"
+    >
       <div
         class="col-span-2 col-start-1 flex h-full w-full flex-col justify-center p-2 md:col-start-2 md:items-center"
       >
@@ -13,7 +19,7 @@ import HeaderTabs from "./HeaderTabs.vue";
         >
       </div>
       <div
-        class="col-start-3 p-2 flex items-center justify-end gap-2 md:col-start-4 md:row-start-1"
+        class="col-start-3 flex items-center justify-end gap-2 p-2 md:col-start-4 md:row-start-1"
       >
         <Button
           icon="pi pi-search"
@@ -27,6 +33,7 @@ import HeaderTabs from "./HeaderTabs.vue";
           icon="pi pi-bars"
           outlined
           size="small"
+          @click="useLayout.changeLayout(LayoutNames.MENU)"
           class="bg-surface-300 dark:bg-highlight"
           aria-label="Search"
         />
