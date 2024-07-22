@@ -12,6 +12,6 @@ import Saved from "@/components/Menu/Items/Saved.vue";
 </template>
 <style scoped>
 .items-container {
-  @apply flex h-fit cursor-pointer items-center gap-3 rounded-md bg-[#faf8f8] px-2 py-2 shadow-sm hover:bg-emphasis dark:bg-[#4f4e4f];
+  @apply flex h-fit cursor-pointer items-center gap-3 rounded-md bg-[#faf8f8] px-2 py-2 shadow-sm transition-all hover:bg-[#f2eeee] dark:bg-[#2d2a2a] dark:hover:bg-[#383838];
 }
 </style>
