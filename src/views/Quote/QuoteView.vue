@@ -71,17 +71,11 @@ watch(post, async (newPost) => {
   }
 });
 
-onUnmounted(() => {
-  postStore.setScrollPosition(0);
-  observer.disconnect();
-});
-
 watch(route, (newRoute) => {
-  window.scrollTo(0, postStore.scrollPosition as number);
+  window.scrollTo(0, 0);
 });
 
 onMounted(async () => {
-  window.scrollTo(0, 0);
   post.value = postStore.posts.find((p) => p.id === currentPostId) || null;
 
   if (!post.value) {
@@ -109,7 +103,7 @@ const topLevelComments = computed(() => {
 });
 </script>
 <template>
-  <div class="flex h-full flex-col p-1">
+  <div class="flex h-full flex-col">
     <CardPostSkeleton v-if="!post"></CardPostSkeleton>
     <CardPost v-if="post" :post="post as Post"></CardPost>
 
@@ -140,7 +134,7 @@ const topLevelComments = computed(() => {
       </div>
     </div>
   </div>
-  <div class="sticky bottom-[0px] px-2 z-10 h-fit">
+  <div class="sticky bottom-[0px] z-10 h-fit px-2">
     <CommentEditor v-if="post" :post-id="post.id"></CommentEditor>
   </div>
 </template>

@@ -3,6 +3,7 @@ import AuthLayout from "@/Layouts/AuthLayout.vue";
 import SplashLayout from "@/Layouts/SplashLayout.vue";
 import PostLayout from "@/Layouts/PostLayout.vue";
 import NestedComments from "@/Layouts/NestedComments.vue";
+import MenuLayout from "@/Layouts/MenuLayout.vue";
 import type { DefineComponent } from "vue";
 
 export enum LayoutNames {
@@ -11,6 +12,7 @@ export enum LayoutNames {
   SPLASH = "SPLASH",
   POST = "POST",
   NESTED_COMMENTS = "NESTED_COMMENTS",
+  MENU = "Menu",
 }
 export const layouts: { [key in LayoutNames]: DefineComponent } = {
   [LayoutNames.HOME]: HomeLayout as DefineComponent,
@@ -18,4 +20,5 @@ export const layouts: { [key in LayoutNames]: DefineComponent } = {
   [LayoutNames.SPLASH]: SplashLayout as DefineComponent,
   [LayoutNames.POST]: PostLayout as DefineComponent,
   [LayoutNames.NESTED_COMMENTS]: NestedComments as DefineComponent,
+  [LayoutNames.MENU]: MenuLayout as DefineComponent,
 };

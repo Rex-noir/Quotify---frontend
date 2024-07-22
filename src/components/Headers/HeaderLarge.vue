@@ -9,9 +9,15 @@ const searchFocus = ref<boolean>(false);
 </script>
 <template>
   <div class="grid-cols-[1fr,1.5fr,1fr] items-center gap-3 border-none py-3">
+<<<<<<< HEAD
     <span class="text-center font-display text-2xl font-bold dark:text-teal-300"
       >Quotify</span
     >
+=======
+    <span class="font-display text-2xl font-bold dark:text-teal-300"
+      >Quotify
+    </span>
+>>>>>>> layout
     <div class="col-start-2">
       <HeaderTabs />
     </div>

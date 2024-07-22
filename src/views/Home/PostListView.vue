@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import type { Post } from "@/types/Post/post.types";
 import DataView from "primevue/dataview";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, onUnmounted, ref } from "vue";
 import CardPost from "@/components/Posts/CardPost.vue";
 import PostUtils from "@/utils/post.utils";
 import CardPostSkeleton from "@/components/Posts/CardPostSkeleton.vue";
 import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
 import usePostStore from "@/stores/posts.store";
-import ModalQuoteView from "@/components/Posts/ModalQuoteView.vue";
+import ModalQuoteView from "@/views/Quote/ModalQuoteView.vue";
+import useLayoutStore from "@/stores/layouts.store";
+import CreatePost from "@/components/Posts/CreatePost.vue";
+import useUserStore from "@/stores/user.store";
 
 const postStore = usePostStore();
+const layoutStore = useLayoutStore();
 
 const posts = ref(postStore.posts);
 const isLoading = ref(false);
+const userStore = useUserStore();
+
+const listContainer = ref<HTMLDivElement | null>(null);
 
 const paginatedPosts = ref<PaginatedResponse<Post>>();
 const hasMore = computed(() => {
@@ -55,15 +62,23 @@ onMounted(async () => {
   if (postLoader) {
     observer.observe(postLoader);
   }
+  window.scrollTo(0, layoutStore.scrollPosition as number);
 });
 
 onUnmounted(() => {
   observer.disconnect();
 });
+
+onBeforeUnmount(() => {
+  if (listContainer.value) {
+    layoutStore.setScrollPosition(window.scrollY);
+  }
+});
 </script>
 
 <template>
-  <main class="">
+  <main class="flex flex-col gap-3">
+    <CreatePost v-if="userStore.status" />
     <DataView :value="posts">
       <template #empty>
         <div class="flex flex-col gap-2">
@@ -71,7 +86,7 @@ onUnmounted(() => {
         </div>
       </template>
       <template #list="slotProp">
-        <div class="flex flex-col gap-2">
+        <div ref="listContainer" class="flex flex-col gap-2">
           <CardPost
             v-for="(post, index) in slotProp.items"
             :post="post as Post"
