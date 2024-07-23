@@ -1,4 +1,4 @@
-import NestedComments from "@/Layouts/NestedComments.vue";
+import NestedComments from "@/views/Quote/NestedComments.vue";
 import PostListView from "@/views/Home/PostListView.vue";
 import QuoteView from "@/views/Quote/QuoteView.vue";
 import type { DefineComponent } from "vue";
