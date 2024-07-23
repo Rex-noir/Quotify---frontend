@@ -1,8 +1,8 @@
 import { Reactions, type PostComment } from "@/types/Post/post.types";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import useResponsive from "./responsive.store";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import usePostStore from "./posts.store";
 import useUserStore from "./user.store";
 
@@ -12,20 +12,59 @@ const useCommentStore = defineStore("comments", () => {
   const layout = computed(() => useResponsive().layout);
   const postsStore = usePostStore();
   const router = useRouter();
+  const route = useRoute();
 
-  const nestedLimit = computed(() => {
-    switch (layout.value) {
-      case "mobile":
-        return 2;
-      case "tablet":
-        return 6;
-      case "desktop":
-        return 12;
+  const baseLimits = {
+    mobile: 2,
+    tablet: 6,
+    desktop: 12,
+  };
+
+  const baseLimit = computed(() => baseLimits[layout.value]);
+
+  console.log(baseLimit.value);
+
+  const routeLimits = ref<{ [path: string]: number }>({});
+
+  // Function to initialize or update route limits
+  function initializeRouteLimit(path: string) {
+    if (!routeLimits.value[path]) {
+      routeLimits.value[path] = baseLimit.value;
     }
-  });
+  }
+
+  watch(
+    () => route.fullPath,
+    (newPath, oldPath) => {
+      // Ensure routeLimits are only set for specific routes
+      if (route.name === "viewQuote" || route.name === "Replies") {
+        // Initialize the base limit if not already set
+        if (!routeLimits.value[newPath]) {
+          if (route.name === "viewQuote") {
+            // Set the base limit for the 'viewQuote' route
+            routeLimits.value[newPath] = baseLimits[layout.value];
+          } else if (route.name === "Replies") {
+            // For nested routes like 'Replies'
+            if (oldPath && routeLimits.value[oldPath] !== undefined) {
+              // Calculate the new limit dynamically based on the old path's limit
+              routeLimits.value[newPath] =
+                routeLimits.value[oldPath] + baseLimits[layout.value];
+            } else {
+              // If accessed directly, set to base limit
+              routeLimits.value[newPath] = baseLimits[layout.value];
+            }
+          }
+        }
+      }
+    },
+    { immediate: true },
+  );
 
   function addComment(newComment: PostComment, postId: number) {
-    if (!postsStore.posts.find((post) => post.id === postId)) {
+    if (
+      !postsStore.posts.find((post) => post.id === postId) &&
+      route.name !== "Replies"
+    ) {
       return;
     }
     if (!comments.value[postId]) {
@@ -52,19 +91,17 @@ const useCommentStore = defineStore("comments", () => {
       const parentComment = comments.value[postId][newComment.parent_id];
       if (parentComment) {
         parentComment.replies = parentComment.replies || [];
-
         if (!parentComment.replies.some((r) => r.id === newComment.id)) {
           newComment.level = (parentComment.level || 0) + 1;
           parentComment.replies.push(newComment);
-          parentComment.replies_count++;
+          parentComment.replies_count = parentComment.replies.length;
 
-          if (newComment.level > nestedLimit.value) {
-            newComment.level = 0;
+          if (newComment.level > routeLimits.value[route.fullPath]) {
             router.push({
               name: "Replies",
               params: {
                 comment_id: parentComment.id,
-                post_id: parentComment.post_id,
+                id: parentComment.post_id,
               },
             });
           }
@@ -193,8 +230,9 @@ const useCommentStore = defineStore("comments", () => {
     stopListeningForComments,
     clearComments,
     getComment,
-    nestedLimit,
     toggleReaction,
+    routeLimits,
+    initializeRouteLimit,
     updateComment,
   };
 });
