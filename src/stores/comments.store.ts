@@ -114,63 +114,66 @@ const useCommentStore = defineStore("comments", () => {
     reaction: Reactions,
     to?: boolean,
   ) {
-    if (useUserStore().status) {
-      const comment = comments.value[post_id][id];
-      if (comment) {
-        //If the reaction is LIKE
-        if (reaction === Reactions.LIKE) {
-          const newIsLikedByUser = to || !comment.is_liked_by_user;
-          if (newIsLikedByUser) {
-            if (!comment.is_liked_by_user) {
-              comment.is_liked_by_user = true;
-              if (!to) comment.likes_count++;
-            }
+    const userStore = useUserStore();
 
-            if (comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = false;
-              if (!to) comment.dislikes_count--;
-            }
-          } else {
-            if (comment.is_liked_by_user) {
-              comment.is_liked_by_user = false;
-              if (!to) comment.likes_count--;
-            }
-          }
-        }
+    if (!userStore.status) {
+      console.warn("Please log in");
+      return;
+    }
 
-        //If the reaction is DISLIKE
-        if (reaction === Reactions.DISLIKE) {
-          const newIsDislikedByUser = to || !comment.is_disliked_by_user;
-          if (newIsDislikedByUser) {
-            if (!comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = true;
-              if (!to) comment.dislikes_count++;
-            }
-            if (comment.is_liked_by_user) {
-              comment.is_liked_by_user = false;
-              if (!to) comment.likes_count--;
-            }
-          } else {
-            if (comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = false;
-              if (!to) comment.dislikes_count--;
-            }
-          }
-        }
+    const comment = comments.value[post_id][id];
+    if (!comment) {
+      console.warn(`Comment with id ${id} could not be found.`);
+      return;
+    }
+
+    const updateCounts = (isLiked: boolean, isDisliked: boolean) => {
+      comment.is_liked_by_user = isLiked;
+      comment.is_disliked_by_user = isDisliked;
+
+      if (isLiked) {
+        comment.likes_count = (comment.likes_count ?? 0) + 1;
       } else {
-        console.warn("Comment id with ", id, "could not be found.");
+        comment.likes_count = Math.max((comment.likes_count ?? 0) - 1, 0);
       }
-    } else {
-      console.warn("User must be logged in!");
+
+      if (isDisliked) {
+        comment.dislikes_count = (comment.dislikes_count ?? 0) + 1;
+      } else {
+        comment.dislikes_count = Math.max((comment.dislikes_count ?? 0) - 1, 0);
+      }
+    };
+
+    if (reaction === Reactions.LIKE) {
+      const shouldLike = to ?? !comment.is_liked_by_user;
+      const shouldDislike = !shouldLike && comment.is_disliked_by_user;
+      updateCounts(shouldLike, false);
+
+      if (shouldDislike) {
+        comment.is_disliked_by_user = false;
+        comment.dislikes_count = Math.max((comment.dislikes_count ?? 0) - 1, 0);
+      }
+    }
+
+    if (reaction === Reactions.DISLIKE) {
+      const shouldDislike = to ?? !comment.is_disliked_by_user;
+      const shouldLike = !shouldDislike && comment.is_liked_by_user;
+
+      updateCounts(false, shouldDislike);
+
+      if (shouldLike) {
+        comment.is_liked_by_user = false;
+        comment.likes_count = Math.max((comment.likes_count ?? 0) - 1, 0);
+      }
     }
   }
 
   function updateComment(updates: Partial<PostComment>) {
     if (updates.post_id && updates.id) {
-      if (comments.value[updates.post_id][updates.id]) {
-        const comment = getComment(updates.post_id, updates.id);
+      const existingComment = comments.value[updates.post_id][updates.id];
+      if (existingComment) {
         comments.value[updates.post_id][updates.id] = {
-          ...comment,
+          ...existingComment,
           ...updates,
         };
       } else {
@@ -205,7 +208,6 @@ const useCommentStore = defineStore("comments", () => {
         parentComment.replies.length > 0
       ) {
         addComment(comment, comment.post_id);
-        console.log("Comment added");
       }
     }
   }
