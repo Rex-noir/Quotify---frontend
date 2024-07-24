@@ -12,6 +12,7 @@ import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
 import CommentSkeleton from "@/components/Comment/CommentSkeleton.vue";
 import CommentEditor from "@/components/Comment/CommentEditor.vue";
 import useCommentStore from "@/stores/comments.store";
+import ScrollTop from "primevue/scrolltop";
 
 const postStore = usePostStore();
 const route = useRoute();
@@ -107,18 +108,26 @@ const topLevelComments = computed(() => {
   <div class="flex h-full flex-col">
     <CardPostSkeleton v-if="!post"></CardPostSkeleton>
     <CardPost v-if="post" :post="post as Post"></CardPost>
-
     <div
       id="commentsContainer"
-      class="prose flex max-w-none flex-col gap-3 p-1 dark:prose-invert"
+      class="prose relative flex max-w-none flex-col gap-3 p-1 dark:prose-invert"
     >
       <h3>Comments</h3>
+
+      <div class="fixed bottom-10 right-0 z-20 md:bottom-0">
+        <ScrollTop
+          :threshold="100"
+          icon="pi pi-arrow-up"
+          :buttonProps="{ severity: 'contrast', raised: true, rounded: true }"
+        />
+      </div>
       <Comment
         v-if="Object.keys(commentStore.comments).length > 0"
         v-for="(comment, index) in topLevelComments"
         :comment="comment"
         :key="comment.id + index"
       ></Comment>
+
       <div class="flex flex-col gap-3">
         <CommentSkeleton
           v-if="commentsLoading"
