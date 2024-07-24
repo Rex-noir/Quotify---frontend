@@ -22,36 +22,34 @@ const useCommentStore = defineStore("comments", () => {
 
   const baseLimit = computed(() => baseLimits[layout.value]);
 
-  console.log(baseLimit.value);
-
-  const routeLimits = ref<{ [path: string]: number }>({});
+  const repliesLimit = ref<{ [path: string]: number }>({});
 
   // Function to initialize or update route limits
   function initializeRouteLimit(path: string) {
-    if (!routeLimits.value[path]) {
-      routeLimits.value[path] = baseLimit.value;
+    if (!repliesLimit.value[path]) {
+      repliesLimit.value[path] = baseLimit.value;
     }
   }
 
   watch(
     () => route.fullPath,
     (newPath, oldPath) => {
-      // Ensure routeLimits are only set for specific routes
+      // Ensure repliesLimit are only set for specific routes
       if (route.name === "viewQuote" || route.name === "Replies") {
         // Initialize the base limit if not already set
-        if (!routeLimits.value[newPath]) {
+        if (!repliesLimit.value[newPath]) {
           if (route.name === "viewQuote") {
             // Set the base limit for the 'viewQuote' route
-            routeLimits.value[newPath] = baseLimits[layout.value];
+            repliesLimit.value[newPath] = baseLimits[layout.value];
           } else if (route.name === "Replies") {
             // For nested routes like 'Replies'
-            if (oldPath && routeLimits.value[oldPath] !== undefined) {
+            if (oldPath && repliesLimit.value[oldPath] !== undefined) {
               // Calculate the new limit dynamically based on the old path's limit
-              routeLimits.value[newPath] =
-                routeLimits.value[oldPath] + baseLimits[layout.value];
+              repliesLimit.value[newPath] =
+                repliesLimit.value[oldPath] + baseLimits[layout.value];
             } else {
               // If accessed directly, set to base limit
-              routeLimits.value[newPath] = baseLimits[layout.value];
+              repliesLimit.value[newPath] = baseLimits[layout.value];
             }
           }
         }
@@ -96,7 +94,7 @@ const useCommentStore = defineStore("comments", () => {
           parentComment.replies.push(newComment);
           parentComment.replies_count = parentComment.replies.length;
 
-          if (newComment.level > routeLimits.value[route.fullPath]) {
+          if (newComment.level > repliesLimit.value[route.fullPath]) {
             router.push({
               name: "Replies",
               params: {
@@ -231,7 +229,7 @@ const useCommentStore = defineStore("comments", () => {
     clearComments,
     getComment,
     toggleReaction,
-    routeLimits,
+    repliesLimit,
     initializeRouteLimit,
     updateComment,
   };

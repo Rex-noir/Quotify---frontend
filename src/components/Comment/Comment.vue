@@ -43,7 +43,7 @@ const showViewMoreReplies = computed(() => {
 
 const showReplyEditor = ref(false);
 
-const limit = computed(() => commentStore.routeLimits[route.fullPath]);
+const limit = computed(() => commentStore.repliesLimit[route.fullPath]);
 
 const getColorByLevel = (level: number): string => {
   const colorPalette = [
@@ -96,7 +96,7 @@ const formattedComment = computed(() => {
 const filteredReplies = computed(() => {
   // On other routes, filter replies based on their level and the nested limit
   return props.comment.replies?.filter(
-    (reply) => reply.level <= commentStore.routeLimits[route.fullPath],
+    (reply) => reply.level <= commentStore.repliesLimit[route.fullPath],
   );
 });
 </script>
