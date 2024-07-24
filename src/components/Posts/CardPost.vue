@@ -25,11 +25,12 @@ const handleBackClick = () => {
 };
 
 const viewPost = () => {
-  if (responsive.layout !== "desktop") {
-    postStore.viewPost(props.post.id);
-  } else if (route.name !== "viewQuote") {
-    postStore.toggleModal(true);
-  }
+  postStore.viewPost(props.post.id);
+  // if (responsive.layout !== "desktop") {
+  //   postStore.viewPost(props.post.id);
+  // } else if (route.name !== "viewQuote") {
+  //   postStore.toggleModal(true);
+  // }
 };
 
 const headerClickFilter = (e: Event) => {
