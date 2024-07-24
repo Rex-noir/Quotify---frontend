@@ -117,7 +117,6 @@ const topLevelComments = computed(() => {
         v-if="Object.keys(commentStore.comments).length > 0"
         v-for="(comment, index) in topLevelComments"
         :comment="comment"
-        :level="0"
         :key="comment.id + index"
       ></Comment>
       <div class="flex flex-col gap-3">
