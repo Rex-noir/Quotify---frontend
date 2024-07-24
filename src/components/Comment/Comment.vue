@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import Avatar from "primevue/avatar";
 import CommentActionBar from "@/components/Comment/CommentActionsBar.vue";
 import Panel from "primevue/panel";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import PostUtils from "@/utils/post.utils";
 import type { User } from "@/types/User/user.types";
 import Spinner from "../Spinner.vue";
@@ -44,17 +44,6 @@ const showViewMoreReplies = computed(() => {
 const showReplyEditor = ref(false);
 
 const limit = computed(() => commentStore.repliesLimit[route.fullPath]);
-
-const getColorByLevel = (level: number): string => {
-  const colorPalette = [
-    "before:border-green-600", // Level 0
-    "before:border-blue-300", // Level 1
-    "before:border-amber-400", // Level 2
-    "before:border-purple-400", // Level 3
-    "before:border-lime-400", // Level 4
-  ];
-  return colorPalette[level % colorPalette.length];
-};
 
 const loadReplies = async () => {
   commentsLoading.value = true;
@@ -110,11 +99,19 @@ const filteredReplies = computed(() => {
       class="comment-parent relative rounded-lg border-b-0 border-l-0 border-r-0 border-t-0 dark:bg-[#2d2a2a]"
     >
       <a
-        :href="`#${comment.id}`"
-        :class="getColorByLevel(comment.level)"
         class="line-down"
+        :class="[
+          {
+            'line-blend': comment.replies?.length,
+            'replies-line-connect': showViewMoreReplies,
+          },
+        ]"
+        :href="`#${comment.id}`"
       ></a>
-
+      <!-- 
+      <div class="relative h-full">
+        <div class="line-bend"></div>
+      </div> -->
       <template #toggleicon="{ collapsed }">
         <div class="">
           <span
@@ -152,14 +149,7 @@ const filteredReplies = computed(() => {
         />
       </div> -->
       <div class="grid grid-cols-[35px,auto]">
-        <div class="relative col-start-1">
-          <div
-            v-if="comment.level !== 0"
-            :class="getColorByLevel(comment.level)"
-            class="line-bend"
-            :href="`#${comment.id}`"
-          ></div>
-        </div>
+        <div class="relative col-start-1"></div>
         <div class="col-start-2 flex flex-col gap-2">
           <div
             class="prose flex w-full max-w-none items-center dark:prose-invert"
@@ -178,8 +168,7 @@ const filteredReplies = computed(() => {
           </div>
           <div
             v-if="showViewMoreReplies"
-            :class="getColorByLevel(comment.level)"
-            class="replies-line-connect prose relative flex max-w-none items-center gap-2 pl-2 text-sm dark:prose-invert"
+            class="prose relative flex max-w-none items-center gap-2 pl-2 text-sm dark:prose-invert"
           >
             <span
               v-if="!commentsLoading"
@@ -206,7 +195,7 @@ const filteredReplies = computed(() => {
       <div class="ml-6 flex flex-col">
         <div v-for="reply in filteredReplies">
           <Comment
-            class="nested-comment"
+            class="nested-comment reply-connector"
             :key="reply.id"
             :parent-user="comment.user"
             :comment="reply"
@@ -218,19 +207,22 @@ const filteredReplies = computed(() => {
 </template>
 <style scoped>
 .line-down {
-  @apply absolute top-8 h-[calc(100%-48px)] w-4;
-  @apply z-10 before:absolute before:left-6 before:top-[16px] before:h-full before:border-l before:content-[''];
-  @apply before:pointer-events-none; /* Add this line */
+  @apply absolute left-7 top-[30px] z-30 h-[calc(100%-48px)] w-1 cursor-pointer hover:border-primary-emphasis;
+  @apply z-10 before:absolute before:top-[17px] before:h-full before:w-1 before:border-l before:content-[''];
+  @apply before:pointer-events-none; /* Ensure clicks pass through */
 
+  &:hover::before,
+  &:hover::after {
+    @apply border-primary-emphasis dark:border-slate-400;
+  }
   /* @apply after:absolute after:left-4 after:top-16 after:h-full after:w-4 after:rounded-b-md after:border-b after:border-l; */
 }
-.line-bend {
-  @apply absolute -left-4 -top-12 h-full;
-  @apply before:absolute before:left-3 before:top-3 before:w-3 before:border-b;
-  @apply before:pointer-events-none; /* Add this line */
+.line-blend {
+  @apply after:absolute after:top-[115px] after:h-2 after:w-[15px] after:rounded-bl-lg after:border-b after:border-l;
 }
+
 .replies-line-connect {
-  @apply before:absolute before:-left-[10px] before:w-4 before:border-b before:content-[''];
   @apply before:pointer-events-none; /* Add this line */
+  @apply after:absolute after:top-[100px] after:h-2 after:w-[15px] after:rounded-bl-lg after:border-b after:border-l;
 }
 </style>
