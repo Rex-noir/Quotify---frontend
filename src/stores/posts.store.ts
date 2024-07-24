@@ -7,13 +7,13 @@ import { useRoute, useRouter } from "vue-router";
 const usePostStore = defineStore("post", () => {
   const posts = ref<Post[]>([]);
   const userStore = useUserStore();
-  const showModal = ref<boolean>(false);
+  // const showModal = ref<boolean>(false);
   const route = useRoute();
   const router = useRouter();
 
-  function toggleModal(bool?: boolean) {
-    showModal.value = bool || !showModal.value;
-  }
+  // function toggleModal(bool?: boolean) {
+  //   showModal.value = bool || !showModal.value;
+  // }
 
   function addPost(post: Post) {
     if (!posts.value.some((p) => p.id === post.id)) {
@@ -132,8 +132,8 @@ const usePostStore = defineStore("post", () => {
     addPost,
     startListeningForUpdates,
     deletePost,
-    showModal,
-    toggleModal,
+    // showModal,
+    // toggleModal,
     viewPost,
     toggleReaction,
     stopListeningForUpdates,

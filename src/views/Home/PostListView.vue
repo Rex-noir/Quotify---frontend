@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
       </template>
     </DataView>
   </main>
-  <ModalQuoteView v-if="postId" :key="Date()" :post-id="postId" />
+  <!-- <ModalQuoteView v-if="postId" :key="Date()" :post-id="postId" /> -->
 </template>
 <style>
 .p-dataview-content {

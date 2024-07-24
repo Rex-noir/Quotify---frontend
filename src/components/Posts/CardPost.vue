@@ -10,6 +10,8 @@ import { HomeViewsEnum } from "@/types/Views/homeviews.type";
 import Button from "primevue/button";
 import useResponsive from "@/stores/responsive.store";
 import usePostStore from "@/stores/posts.store";
+import useResponsive from "@/stores/responsive.store";
+import usePostStore from "@/stores/posts.store";
 
 const router = useRouter();
 const route = useRoute();
@@ -25,11 +27,12 @@ const handleBackClick = () => {
 };
 
 const viewPost = () => {
-  if (responsive.layout !== "desktop") {
-    postStore.viewPost(props.post.id);
-  } else if (route.name !== "viewQuote") {
-    postStore.toggleModal(true);
-  }
+  postStore.viewPost(props.post.id);
+  // if (responsive.layout !== "desktop") {
+  //   postStore.viewPost(props.post.id);
+  // } else if (route.name !== "viewQuote") {
+  //   postStore.toggleModal(true);
+  // }
 };
 
 const headerClickFilter = (e: Event) => {
