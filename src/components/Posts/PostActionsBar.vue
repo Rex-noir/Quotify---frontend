@@ -34,11 +34,11 @@ const handleClick = async (action: PostBarActions) => {
     if (post.value) {
       switch (action) {
         case PostBarActions.COMMENT:
-          if (responsive.layout !== "desktop") {
-            postStore.viewPost(post.value.id);
-          } else if (route.name !== "viewQuote") {
-            postStore.toggleModal(true);
-          }
+          // if (responsive.layout !== "desktop") {
+          postStore.viewPost(post.value.id);
+          // } else if (route.name !== "viewQuote") {
+          // postStore.toggleModal(true);
+          // }
           break;
 
         case PostBarActions.LIKE:
