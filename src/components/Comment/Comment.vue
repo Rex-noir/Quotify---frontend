@@ -24,6 +24,9 @@ const props = defineProps<{
 }>();
 
 const commentStore = useCommentStore();
+const comment = computed(
+  () => commentStore.comments[props.comment.post_id][props.comment.id],
+);
 
 const router = useRouter();
 const route = useRoute();
@@ -32,12 +35,12 @@ const commentLoaded = ref<boolean>(false);
 
 const showViewMoreReplies = computed(() => {
   return (
-    (props.comment.replies_count &&
-      (props.comment.replies_count as number) > 0 &&
-      props.comment.replies?.length !== props.comment.replies_count &&
+    (comment.value.replies_count &&
+      (comment.value.replies_count as number) > 0 &&
+      comment.value.replies?.length !== comment.value.replies_count &&
       !props.nestedMain &&
       !commentLoaded.value) ||
-    (props.comment.level >= limit.value && props.comment.replies_count > 0)
+    (comment.value.level >= limit.value && comment.value.replies_count > 0)
   );
 });
 
@@ -48,7 +51,7 @@ const limit = computed(() => commentStore.repliesLimit[route.fullPath]);
 const loadReplies = async () => {
   commentsLoading.value = true;
   try {
-    const newReplies = await PostUtils.loadReplies(props.comment.id);
+    const newReplies = await PostUtils.loadReplies(comment.value.id);
     newReplies.forEach((reply) =>
       commentStore.addComment(reply, reply.post_id),
     );
@@ -60,10 +63,10 @@ const loadReplies = async () => {
 };
 
 const handleLoadingMore = async () => {
-  if (props.comment.level >= limit.value) {
+  if (comment.value.level >= limit.value) {
     router.push({
       name: "Replies",
-      params: { comment_id: props.comment.id, id: props.comment.post_id },
+      params: { comment_id: comment.value.id, id: comment.value.post_id },
     });
   } else {
     await loadReplies();
@@ -76,7 +79,7 @@ const commentAdded = ref(false);
 const formattedComment = computed(() => {
   const mentionRegex = new RegExp(`@(${props.parentUser?.name})`, "g");
   const formattedText = formatTextWithMentions(
-    props.comment.content,
+    comment.value.content,
     mentionRegex,
   );
   return formattedText;
@@ -84,7 +87,7 @@ const formattedComment = computed(() => {
 
 const filteredReplies = computed(() => {
   // On other routes, filter replies based on their level and the nested limit
-  return props.comment.replies?.filter(
+  return comment.value.replies?.filter(
     (reply) => reply.level <= commentStore.repliesLimit[route.fullPath],
   );
 });
