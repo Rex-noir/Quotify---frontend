@@ -183,26 +183,15 @@ const useCommentStore = defineStore("comments", () => {
     }
   }
 
-  function updateComment(data: {
-    public: Partial<PostComment>;
-    private: Partial<PostComment>;
-  }) {
-    if (data.public.post_id && data.public.id) {
+  function updateComment(data: { updates: Partial<PostComment> }) {
+    if (data.updates.post_id && data.updates.id) {
       const existingComment =
-        comments.value[data.public.post_id][data.public.id];
+        comments.value[data.updates.post_id][data.updates.id];
       if (existingComment) {
-        if (data.private.user_id === userStore.userInfo?.id) {
-          comments.value[data.public.post_id][data.public.id] = {
-            ...existingComment,
-            ...data.public,
-            ...data.private,
-          };
-        } else {
-          comments.value[data.public.post_id][data.public.id] = {
-            ...existingComment,
-            ...data.public,
-          };
-        }
+        comments.value[data.updates.post_id][data.updates.id] = {
+          ...existingComment,
+          ...data.updates,
+        };
       } else {
         console.warn("Comment to update is not found");
       }
@@ -218,15 +207,9 @@ const useCommentStore = defineStore("comments", () => {
       .listen(`CommentAdded`, (e: { comment: PostComment }) => {
         addNewCommentsFromSocket(e.comment);
       })
-      .listen(
-        "CommentUpdated",
-        (e: {
-          public: Partial<PostComment>;
-          private: Partial<PostComment>;
-        }) => {
-          updateComment(e);
-        },
-      );
+      .listen("CommentUpdated", (e: { updates: Partial<PostComment> }) => {
+        updateComment(e);
+      });
   }
 
   function addNewCommentsFromSocket(comment: PostComment) {
