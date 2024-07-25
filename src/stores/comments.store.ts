@@ -13,6 +13,7 @@ const useCommentStore = defineStore("comments", () => {
   const postsStore = usePostStore();
   const router = useRouter();
   const route = useRoute();
+  const userStore = useUserStore();
 
   const baseLimits = {
     mobile: 2,
@@ -114,65 +115,94 @@ const useCommentStore = defineStore("comments", () => {
     reaction: Reactions,
     to?: boolean,
   ) {
-    if (useUserStore().status) {
-      const comment = comments.value[post_id][id];
-      if (comment) {
-        //If the reaction is LIKE
-        if (reaction === Reactions.LIKE) {
-          const newIsLikedByUser = to || !comment.is_liked_by_user;
-          if (newIsLikedByUser) {
-            if (!comment.is_liked_by_user) {
-              comment.is_liked_by_user = true;
-              if (!to) comment.likes_count++;
-            }
+    if (!userStore.status) {
+      console.warn("Please log in");
+      return;
+    }
 
-            if (comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = false;
-              if (!to) comment.dislikes_count--;
-            }
-          } else {
-            if (comment.is_liked_by_user) {
-              comment.is_liked_by_user = false;
-              if (!to) comment.likes_count--;
-            }
-          }
-        }
+    const comment = comments.value[post_id][id];
+    if (!comment) {
+      console.warn(`Comment with id ${id} could not be found.`);
+      return;
+    }
 
-        //If the reaction is DISLIKE
-        if (reaction === Reactions.DISLIKE) {
-          const newIsDislikedByUser = to || !comment.is_disliked_by_user;
-          if (newIsDislikedByUser) {
-            if (!comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = true;
-              if (!to) comment.dislikes_count++;
-            }
-            if (comment.is_liked_by_user) {
-              comment.is_liked_by_user = false;
-              if (!to) comment.likes_count--;
-            }
-          } else {
-            if (comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = false;
-              if (!to) comment.dislikes_count--;
-            }
-          }
-        }
-      } else {
-        console.warn("Comment id with ", id, "could not be found.");
+    const currentUserLiked = comment.is_liked_by_user;
+    const currentUserDisliked = comment.is_disliked_by_user;
+
+    // Helper function to update the reaction counts
+    const updateCounts = (newLiked: boolean, newDisliked: boolean) => {
+      // Update the like status
+      if (newLiked) {
+        comment.likes_count = (comment.likes_count ?? 0) + 1;
+      } else if (currentUserLiked) {
+        comment.likes_count = Math.max((comment.likes_count ?? 0) - 1, 0);
       }
-    } else {
-      console.warn("User must be logged in!");
+
+      // Update the dislike status
+      if (newDisliked) {
+        comment.dislikes_count = (comment.dislikes_count ?? 0) + 1;
+      } else if (currentUserDisliked) {
+        comment.dislikes_count = Math.max((comment.dislikes_count ?? 0) - 1, 0);
+      }
+    };
+
+    // Handle like reaction
+    if (reaction === Reactions.LIKE) {
+      const shouldLike = to ?? !currentUserLiked;
+      const shouldDislike = currentUserDisliked;
+
+      // Update counts based on reaction change
+      updateCounts(shouldLike, false);
+
+      // Remove dislike if liking
+      if (shouldDislike) {
+        comment.is_disliked_by_user = false;
+        comment.dislikes_count = Math.max((comment.dislikes_count ?? 0) - 1, 0);
+      }
+
+      // Set the new like status
+      comment.is_liked_by_user = shouldLike;
+    }
+
+    // Handle dislike reaction
+    if (reaction === Reactions.DISLIKE) {
+      const shouldDislike = to ?? !currentUserDisliked;
+      const shouldLike = currentUserLiked;
+
+      // Update counts based on reaction change
+      updateCounts(false, shouldDislike);
+
+      // Remove like if disliking
+      if (shouldLike) {
+        comment.is_liked_by_user = false;
+        comment.likes_count = Math.max((comment.likes_count ?? 0) - 1, 0);
+      }
+
+      // Set the new dislike status
+      comment.is_disliked_by_user = shouldDislike;
     }
   }
 
-  function updateComment(updates: Partial<PostComment>) {
-    if (updates.post_id && updates.id) {
-      if (comments.value[updates.post_id][updates.id]) {
-        const comment = getComment(updates.post_id, updates.id);
-        comments.value[updates.post_id][updates.id] = {
-          ...comment,
-          ...updates,
-        };
+  function updateComment(data: {
+    public: Partial<PostComment>;
+    private: Partial<PostComment>;
+  }) {
+    if (data.public.post_id && data.public.id) {
+      const existingComment =
+        comments.value[data.public.post_id][data.public.id];
+      if (existingComment) {
+        if (data.private.user_id === userStore.userInfo?.id) {
+          comments.value[data.public.post_id][data.public.id] = {
+            ...existingComment,
+            ...data.public,
+            ...data.private,
+          };
+        } else {
+          comments.value[data.public.post_id][data.public.id] = {
+            ...existingComment,
+            ...data.public,
+          };
+        }
       } else {
         console.warn("Comment to update is not found");
       }
@@ -188,9 +218,15 @@ const useCommentStore = defineStore("comments", () => {
       .listen(`CommentAdded`, (e: { comment: PostComment }) => {
         addNewCommentsFromSocket(e.comment);
       })
-      .listen("CommentUpdated", (e: { updates: Partial<PostComment> }) => {
-        updateComment(e.updates);
-      });
+      .listen(
+        "CommentUpdated",
+        (e: {
+          public: Partial<PostComment>;
+          private: Partial<PostComment>;
+        }) => {
+          updateComment(e);
+        },
+      );
   }
 
   function addNewCommentsFromSocket(comment: PostComment) {
@@ -205,7 +241,6 @@ const useCommentStore = defineStore("comments", () => {
         parentComment.replies.length > 0
       ) {
         addComment(comment, comment.post_id);
-        console.log("Comment added");
       }
     }
   }
