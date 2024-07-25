@@ -22,46 +22,28 @@ const usePostStore = defineStore("post", () => {
   }
 
   function startListeningForUpdates() {
-    window.Echo.channel("posts")
-      .listen("PostUpdated", (e: { updates: Post }) => {
+    window.Echo.channel("posts").listen(
+      "PostUpdated",
+      (e: { updates: Partial<Post> }) => {
         updatePost(e.updates);
-      })
-      .listen(
-        "LikeDislikeClicked",
-        (e: {
-          likeOrDislike: { is_like: boolean; is_dislike: boolean };
-          postId: number;
-        }) => {
-          if (e.likeOrDislike.is_like) {
-            toggleReaction(e.postId, Reactions.LIKE, e.likeOrDislike.is_like);
-          }
-          if (e.likeOrDislike.is_dislike) {
-            toggleReaction(
-              e.postId,
-              Reactions.DISLIKE,
-              e.likeOrDislike.is_dislike,
-            );
-          }
-        },
-      );
+      },
+    );
   }
 
   function stopListeningForUpdates() {
-    window.Echo.channel("post")
-      .stopListening("PostUpdated")
-      .stopListening("LikeDislikeClicked");
+    window.Echo.channel("post").stopListening("PostUpdated");
   }
 
-  function updatePost(update: Post) {
-    const postIndex = posts.value.findIndex((post) => post.id === update.id);
+  function updatePost(updates: Partial<Post>) {
+    const postIndex = posts.value.findIndex((post) => post.id === updates.id);
 
     if (postIndex !== -1) {
       posts.value.splice(postIndex, 1, {
         ...posts.value[postIndex],
-        ...update,
+        ...updates,
       });
     } else {
-      console.warn("Post id with", update.id, "not found in store to update.");
+      console.warn("Post id with", updates.id, "not found in store to update.");
     }
   }
 
@@ -132,6 +114,7 @@ const usePostStore = defineStore("post", () => {
     addPost,
     startListeningForUpdates,
     deletePost,
+    updatePost,
     // showModal,
     // toggleModal,
     viewPost,
