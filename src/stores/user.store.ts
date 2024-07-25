@@ -1,14 +1,16 @@
-import type { Post } from "@/types/Post/post.types";
+import type { Post, PostComment } from "@/types/Post/post.types";
 import type { User } from "@/types/User/user.types";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import usePostStore from "./posts.store";
+import useCommentStore from "./comments.store";
 
 const useUserStore = defineStore("user", () => {
   const status = ref<boolean>();
   const userInfo = ref<User | null>(null);
   const loading = ref<boolean>(true);
   const postStore = usePostStore();
+  const commentStore = useCommentStore();
 
   function logOut() {
     status.value = false;
@@ -23,12 +25,16 @@ const useUserStore = defineStore("user", () => {
   }
 
   function startListening() {
-    window.Echo.private(`App.Models.User.${userInfo.value?.id}`).listen(
-      "UserSpecificPostUpdates",
-      (e: { updates: Partial<Post> }) => {
+    window.Echo.private(`App.Models.User.${userInfo.value?.id}`)
+      .listen("UserSpecificPostUpdates", (e: { updates: Partial<Post> }) => {
         postStore.updatePost(e.updates);
-      },
-    );
+      })
+      .listen(
+        "UserSpecificCommentUpdates",
+        (e: { updates: Partial<PostComment> }) => {
+          commentStore.updateComment(e);
+        },
+      );
   }
 
   function stopListening() {
