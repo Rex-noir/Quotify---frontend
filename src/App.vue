@@ -4,10 +4,39 @@ import router from "./router";
 import type { LayoutNames } from "./types/Layouts/layouts.types";
 import Toast from "primevue/toast";
 import ProgressBar from "primevue/progressbar";
+import { onBeforeUnmount, onMounted, watch } from "vue";
+import useUserStore from "./stores/user.store";
+import useCommentStore from "./stores/comments.store";
+import usePostStore from "./stores/posts.store";
 
 const layoutStore = useLayoutStore();
+const postStore = usePostStore();
+const commentStore = useCommentStore();
+
 router.afterEach((to) => {
   layoutStore.changeLayout(to.meta.layout as LayoutNames);
+});
+const userStore = useUserStore();
+
+watch(
+  () => userStore.status,
+  (newStatus) => {
+    if (newStatus) {
+      userStore.startListening();
+    }
+  },
+);
+
+onMounted(() => {
+  postStore.startListeningForUpdates();
+  commentStore.startListeningForComments();
+});
+onBeforeUnmount(() => {
+  postStore.stopListeningForUpdates();
+  commentStore.stopListeningForComments();
+  if (userStore.status) {
+    userStore.stopListening();
+  }
 });
 </script>
 
