@@ -5,21 +5,8 @@ import CommunitiesView from "@/views/Home/CommunitiesView.vue";
 import SideLoggedIn from "@/components/SideBar/SideLoggedIn.vue";
 import SideNotLoggedIn from "@/components/SideBar/SideNotLoggedIn.vue";
 import useUserStore from "@/stores/user.store";
-import usePostStore from "@/stores/posts.store";
-import { onMounted, onUnmounted } from "vue";
-import useCommentStore from "@/stores/comments.store";
 
 const userStore = useUserStore();
-const postStore = usePostStore();
-const commentStore = useCommentStore();
-onMounted(() => {
-  postStore.startListeningForUpdates();
-  commentStore.startListeningForComments();
-});
-onUnmounted(() => {
-  postStore.stopListeningForUpdates();
-  commentStore.stopListeningForComments();
-});
 </script>
 <template>
   <div class="relative h-full">
