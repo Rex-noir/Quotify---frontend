@@ -147,3 +147,8 @@ const topLevelComments = computed(() => {
     <CommentEditor v-if="post" :post-id="post.id"></CommentEditor>
   </div>
 </template>
+<style>
+.p-scrolltop {
+  @apply prose max-w-none dark:prose-invert text-white dark:hover:border-none dark:hover:bg-slate-700;
+}
+</style>
