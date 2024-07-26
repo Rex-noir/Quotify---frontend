@@ -4,16 +4,13 @@ import Panel from "primevue/panel";
 import Avatar from "primevue/avatar";
 import PostActions from "./PostActionsBar.vue";
 import dayjs from "dayjs";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import useHomeViews from "@/stores/homeviews.store";
 import { HomeViewsEnum } from "@/types/Views/homeviews.type";
 import Button from "primevue/button";
-import useResponsive from "@/stores/responsive.store";
 import usePostStore from "@/stores/posts.store";
 
 const router = useRouter();
-const route = useRoute();
-const responsive = useResponsive();
 const postStore = usePostStore();
 
 const props = defineProps<{ post: Post }>();
@@ -25,11 +22,12 @@ const handleBackClick = () => {
 };
 
 const viewPost = () => {
-  if (responsive.layout !== "desktop") {
-    postStore.viewPost(props.post.id);
-  } else if (route.name !== "viewQuote") {
-    postStore.toggleModal(true);
-  }
+  postStore.viewPost(props.post.id);
+  // if (responsive.layout !== "desktop") {
+  //   postStore.viewPost(props.post.id);
+  // } else if (route.name !== "viewQuote") {
+  //   postStore.toggleModal(true);
+  // }
 };
 
 const headerClickFilter = (e: Event) => {

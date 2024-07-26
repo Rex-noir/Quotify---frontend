@@ -12,10 +12,10 @@ import Message from "primevue/message";
 import { isAxiosError } from "axios";
 
 const login = ref<{
-  email: string;
+  credential: string;
   password: string;
 }>({
-  email: "",
+  credential: "",
   password: "",
 });
 
@@ -25,7 +25,14 @@ const loginLoading = ref<boolean>(false);
 const handleLogin = async () => {
   try {
     loginLoading.value = true;
-    await AuthUtils.login(login.value.email, login.value.password);
+
+    const isEmail = login.value.credential.includes("@");
+
+    const credentials = {
+      [isEmail ? "email" : "username"]: login.value.credential,
+      password: login.value.password,
+    };
+    await AuthUtils.login(credentials);
     loginLoading.value = false;
     location.reload();
   } catch (error) {
@@ -58,10 +65,9 @@ const handleLogin = async () => {
           <InputText
             class="prose border-none dark:prose-invert"
             autocomplete="email"
-            placeholder="Email"
+            placeholder="Email or username"
             name="email"
-            type="email"
-            v-model="login.email"
+            v-model="login.credential"
           />
         </InputGroup>
         <InputGroup>

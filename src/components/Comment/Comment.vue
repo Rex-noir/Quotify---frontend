@@ -7,15 +7,15 @@ import Panel from "primevue/panel";
 import { computed, ref } from "vue";
 import PostUtils from "@/utils/post.utils";
 import type { User } from "@/types/User/user.types";
-import { useRouter } from "vue-router";
-import Button from "primevue/button";
 import Spinner from "../Spinner.vue";
 import useCommentStore from "@/stores/comments.store";
 import relativeTime from "dayjs/plugin/relativeTime";
 import CommentEditor from "./CommentEditor.vue";
 import { formatTextWithMentions } from "@/utils/utils";
+import { useRoute, useRouter } from "vue-router";
 
 dayjs.extend(relativeTime);
+
 const commentsLoading = ref(false);
 const props = defineProps<{
   comment: PostComment;
@@ -24,45 +24,34 @@ const props = defineProps<{
 }>();
 
 const commentStore = useCommentStore();
+const comment = computed(
+  () => commentStore.comments[props.comment.post_id][props.comment.id],
+);
+
+const router = useRouter();
+const route = useRoute();
 
 const commentLoaded = ref<boolean>(false);
 
 const showViewMoreReplies = computed(() => {
   return (
-    (props.comment.replies_count &&
-      (props.comment.replies_count as number) > 0 &&
-      props.comment.replies?.length !== props.comment.replies_count &&
+    (comment.value.replies_count &&
+      (comment.value.replies_count as number) > 0 &&
+      comment.value.replies?.length !== comment.value.replies_count &&
       !props.nestedMain &&
       !commentLoaded.value) ||
-    (props.comment.level + 1 >= limit &&
-      props.comment.replies_count > 0 &&
-      !props.nestedMain &&
-      !commentLoaded.value)
+    (comment.value.level >= limit.value && comment.value.replies_count > 0)
   );
 });
 
-const router = useRouter();
-
 const showReplyEditor = ref(false);
 
-const limit = commentStore.nestedLimit;
-
-const colorPalette = [
-  "before:border-green-600", // Level 0
-  "before:border-blue-300", // Level 1
-  "before:border-amber-400", // Level 2
-  "before:border-purple-400", // Level 3
-  "before:border-lime-400", // Level 4
-];
-
-const borderColors = computed(() => {
-  return colorPalette[props.comment.level % colorPalette.length];
-});
+const limit = computed(() => commentStore.repliesLimit[route.fullPath]);
 
 const loadReplies = async () => {
   commentsLoading.value = true;
   try {
-    const newReplies = await PostUtils.loadReplies(props.comment.id);
+    const newReplies = await PostUtils.loadReplies(comment.value.id);
     newReplies.forEach((reply) =>
       commentStore.addComment(reply, reply.post_id),
     );
@@ -74,10 +63,10 @@ const loadReplies = async () => {
 };
 
 const handleLoadingMore = async () => {
-  if (props.comment.level >= limit) {
+  if (comment.value.level >= limit.value) {
     router.push({
       name: "Replies",
-      params: { comment_id: props.comment.id, post_id: props.comment.post_id },
+      params: { comment_id: comment.value.id, id: comment.value.post_id },
     });
   } else {
     await loadReplies();
@@ -90,10 +79,17 @@ const commentAdded = ref(false);
 const formattedComment = computed(() => {
   const mentionRegex = new RegExp(`@(${props.parentUser?.name})`, "g");
   const formattedText = formatTextWithMentions(
-    props.comment.content,
+    comment.value.content,
     mentionRegex,
   );
   return formattedText;
+});
+
+const filteredReplies = computed(() => {
+  // On other routes, filter replies based on their level and the nested limit
+  return comment.value.replies?.filter(
+    (reply) => reply.level <= commentStore.repliesLimit[route.fullPath],
+  );
 });
 </script>
 <template>
@@ -105,8 +101,20 @@ const formattedComment = computed(() => {
       :id="comment.id"
       class="comment-parent relative rounded-lg border-b-0 border-l-0 border-r-0 border-t-0 dark:bg-[#2d2a2a]"
     >
-      <a :href="`#${comment.id}`" :class="borderColors" class="line-down"></a>
-
+      <a
+        class="line-down"
+        :class="[
+          {
+            'line-blend': comment.replies?.length,
+            'replies-line-connect': showViewMoreReplies,
+          },
+        ]"
+        :href="`#${comment.id}`"
+      ></a>
+      <!-- 
+      <div class="relative h-full">
+        <div class="line-bend"></div>
+      </div> -->
       <template #toggleicon="{ collapsed }">
         <div class="">
           <span
@@ -117,14 +125,6 @@ const formattedComment = computed(() => {
 
       <template #header>
         <div class="prose flex items-center gap-1 p-2 dark:prose-invert">
-          <div v-if="nestedMain">
-            <Button
-              icon="pi pi-arrow-left"
-              @click="$router.go(-1)"
-              class="prose border-none bg-inherit p-0 dark:prose-invert"
-            />
-          </div>
-
           <Avatar
             :label="comment?.user.name.charAt(0)"
             class="border bg-inherit"
@@ -152,14 +152,7 @@ const formattedComment = computed(() => {
         />
       </div> -->
       <div class="grid grid-cols-[35px,auto]">
-        <div class="relative col-start-1">
-          <div
-            v-if="comment.level !== 0"
-            :class="borderColors"
-            class="line-bend"
-            :href="`#${comment.id}`"
-          ></div>
-        </div>
+        <div class="relative col-start-1"></div>
         <div class="col-start-2 flex flex-col gap-2">
           <div
             class="prose flex w-full max-w-none items-center dark:prose-invert"
@@ -178,8 +171,7 @@ const formattedComment = computed(() => {
           </div>
           <div
             v-if="showViewMoreReplies"
-            :class="borderColors"
-            class="replies-line-connect prose relative flex max-w-none items-center gap-2 pl-2 text-sm dark:prose-invert"
+            class="prose relative flex max-w-none items-center gap-2 pl-2 text-sm dark:prose-invert"
           >
             <span
               v-if="!commentsLoading"
@@ -203,34 +195,37 @@ const formattedComment = computed(() => {
         </div>
       </div>
 
-      <div class="ml-8 flex flex-col">
-        <Comment
-          class="nested-comment"
-          v-for="reply in comment.replies"
-          v-if="comment.level < limit && !nestedMain"
-          :key="reply.id"
-          :parent-user="comment.user"
-          :comment="reply"
-        />
+      <div class="ml-6 flex flex-col">
+        <div v-for="reply in filteredReplies">
+          <Comment
+            class="nested-comment reply-connector"
+            :key="reply.id"
+            :parent-user="comment.user"
+            :comment="reply"
+          />
+        </div>
       </div>
     </Panel>
   </div>
 </template>
 <style scoped>
 .line-down {
-  @apply absolute top-8 h-[calc(100%-48px)] w-4;
-  @apply before:absolute before:left-6 before:top-[16px] before:h-full before:border-l before:content-[''];
-  @apply before:pointer-events-none; /* Add this line */
+  @apply absolute left-7 top-[30px] z-30 h-[calc(100%-48px)] w-1 cursor-pointer hover:border-primary-emphasis;
+  @apply z-10 before:absolute before:top-[17px] before:h-full before:w-1 before:border-l before:content-[''];
+  @apply before:pointer-events-none; /* Ensure clicks pass through */
 
+  &:hover::before,
+  &:hover::after {
+    @apply border-primary-emphasis dark:border-slate-400;
+  }
   /* @apply after:absolute after:left-4 after:top-16 after:h-full after:w-4 after:rounded-b-md after:border-b after:border-l; */
 }
-.line-bend {
-  @apply absolute -left-4 -top-12 h-full;
-  @apply before:absolute before:left-1 before:top-3 before:w-5 before:border-b;
-  @apply before:pointer-events-none; /* Add this line */
+.line-blend {
+  @apply after:absolute after:top-[115px] after:h-2 after:w-[15px] after:rounded-bl-lg after:border-b after:border-l;
 }
+
 .replies-line-connect {
-  @apply before:absolute before:-left-[10px] before:w-4 before:border-b before:content-[''];
   @apply before:pointer-events-none; /* Add this line */
+  @apply after:absolute after:top-[100px] after:h-2 after:w-[15px] after:rounded-bl-lg after:border-b after:border-l;
 }
 </style>

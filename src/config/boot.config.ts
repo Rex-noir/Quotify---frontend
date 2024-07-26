@@ -5,6 +5,15 @@ import usePrefStore from "@/stores/preferences.store";
 
 //config import
 import "./echo.config";
+import Echo from "laravel-echo";
+
+//Declare
+declare global {
+  interface Window {
+    Pusher: any;
+    Echo: Echo;
+  }
+}
 
 async function boot() {
   usePrefStore().loadUserPref();

@@ -1,8 +1,8 @@
 import { Reactions, type PostComment } from "@/types/Post/post.types";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import useResponsive from "./responsive.store";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import usePostStore from "./posts.store";
 import useUserStore from "./user.store";
 
@@ -12,20 +12,58 @@ const useCommentStore = defineStore("comments", () => {
   const layout = computed(() => useResponsive().layout);
   const postsStore = usePostStore();
   const router = useRouter();
+  const route = useRoute();
+  const userStore = useUserStore();
 
-  const nestedLimit = computed(() => {
-    switch (layout.value) {
-      case "mobile":
-        return 2;
-      case "tablet":
-        return 6;
-      case "desktop":
-        return 12;
+  const baseLimits = {
+    mobile: 2,
+    tablet: 6,
+    desktop: 12,
+  };
+
+  const baseLimit = computed(() => baseLimits[layout.value]);
+
+  const repliesLimit = ref<{ [path: string]: number }>({});
+
+  // Function to initialize or update route limits
+  function initializeRouteLimit(path: string) {
+    if (!repliesLimit.value[path]) {
+      repliesLimit.value[path] = baseLimit.value;
     }
-  });
+  }
+
+  watch(
+    () => route.fullPath,
+    (newPath, oldPath) => {
+      // Ensure repliesLimit are only set for specific routes
+      if (route.name === "viewQuote" || route.name === "Replies") {
+        // Initialize the base limit if not already set
+        if (!repliesLimit.value[newPath]) {
+          if (route.name === "viewQuote") {
+            // Set the base limit for the 'viewQuote' route
+            repliesLimit.value[newPath] = baseLimits[layout.value];
+          } else if (route.name === "Replies") {
+            // For nested routes like 'Replies'
+            if (oldPath && repliesLimit.value[oldPath] !== undefined) {
+              // Calculate the new limit dynamically based on the old path's limit
+              repliesLimit.value[newPath] =
+                repliesLimit.value[oldPath] + baseLimits[layout.value];
+            } else {
+              // If accessed directly, set to base limit
+              repliesLimit.value[newPath] = baseLimits[layout.value];
+            }
+          }
+        }
+      }
+    },
+    { immediate: true },
+  );
 
   function addComment(newComment: PostComment, postId: number) {
-    if (!postsStore.posts.find((post) => post.id === postId)) {
+    if (
+      !postsStore.posts.find((post) => post.id === postId) &&
+      route.name !== "Replies"
+    ) {
       return;
     }
     if (!comments.value[postId]) {
@@ -52,19 +90,17 @@ const useCommentStore = defineStore("comments", () => {
       const parentComment = comments.value[postId][newComment.parent_id];
       if (parentComment) {
         parentComment.replies = parentComment.replies || [];
-
         if (!parentComment.replies.some((r) => r.id === newComment.id)) {
           newComment.level = (parentComment.level || 0) + 1;
           parentComment.replies.push(newComment);
-          parentComment.replies_count++;
+          parentComment.replies_count = parentComment.replies.length;
 
-          if (newComment.level > nestedLimit.value) {
-            newComment.level = 0;
+          if (newComment.level > repliesLimit.value[route.fullPath]) {
             router.push({
               name: "Replies",
               params: {
                 comment_id: parentComment.id,
-                post_id: parentComment.post_id,
+                id: parentComment.post_id,
               },
             });
           }
@@ -79,64 +115,82 @@ const useCommentStore = defineStore("comments", () => {
     reaction: Reactions,
     to?: boolean,
   ) {
-    if (useUserStore().status) {
-      const comment = comments.value[post_id][id];
-      if (comment) {
-        //If the reaction is LIKE
-        if (reaction === Reactions.LIKE) {
-          const newIsLikedByUser = to || !comment.is_liked_by_user;
-          if (newIsLikedByUser) {
-            if (!comment.is_liked_by_user) {
-              comment.is_liked_by_user = true;
-              if (!to) comment.likes_count++;
-            }
+    if (!userStore.status) {
+      console.warn("Please log in");
+      return;
+    }
 
-            if (comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = false;
-              if (!to) comment.dislikes_count--;
-            }
-          } else {
-            if (comment.is_liked_by_user) {
-              comment.is_liked_by_user = false;
-              if (!to) comment.likes_count--;
-            }
-          }
-        }
+    const comment = comments.value[post_id][id];
+    if (!comment) {
+      console.warn(`Comment with id ${id} could not be found.`);
+      return;
+    }
 
-        //If the reaction is DISLIKE
-        if (reaction === Reactions.DISLIKE) {
-          const newIsDislikedByUser = to || !comment.is_disliked_by_user;
-          if (newIsDislikedByUser) {
-            if (!comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = true;
-              if (!to) comment.dislikes_count++;
-            }
-            if (comment.is_liked_by_user) {
-              comment.is_liked_by_user = false;
-              if (!to) comment.likes_count--;
-            }
-          } else {
-            if (comment.is_disliked_by_user) {
-              comment.is_disliked_by_user = false;
-              if (!to) comment.dislikes_count--;
-            }
-          }
-        }
-      } else {
-        console.warn("Comment id with ", id, "could not be found.");
+    const currentUserLiked = comment.is_liked_by_user;
+    const currentUserDisliked = comment.is_disliked_by_user;
+
+    // Helper function to update the reaction counts
+    const updateCounts = (newLiked: boolean, newDisliked: boolean) => {
+      // Update the like status
+      if (newLiked) {
+        comment.likes_count = (comment.likes_count ?? 0) + 1;
+      } else if (currentUserLiked) {
+        comment.likes_count = Math.max((comment.likes_count ?? 0) - 1, 0);
       }
-    } else {
-      console.warn("User must be logged in!");
+
+      // Update the dislike status
+      if (newDisliked) {
+        comment.dislikes_count = (comment.dislikes_count ?? 0) + 1;
+      } else if (currentUserDisliked) {
+        comment.dislikes_count = Math.max((comment.dislikes_count ?? 0) - 1, 0);
+      }
+    };
+
+    // Handle like reaction
+    if (reaction === Reactions.LIKE) {
+      const shouldLike = to ?? !currentUserLiked;
+      const shouldDislike = currentUserDisliked;
+
+      // Update counts based on reaction change
+      updateCounts(shouldLike, false);
+
+      // Remove dislike if liking
+      if (shouldDislike) {
+        comment.is_disliked_by_user = false;
+        comment.dislikes_count = Math.max((comment.dislikes_count ?? 0) - 1, 0);
+      }
+
+      // Set the new like status
+      comment.is_liked_by_user = shouldLike;
+    }
+
+    // Handle dislike reaction
+    if (reaction === Reactions.DISLIKE) {
+      const shouldDislike = to ?? !currentUserDisliked;
+      const shouldLike = currentUserLiked;
+
+      // Update counts based on reaction change
+      updateCounts(false, shouldDislike);
+
+      // Remove like if disliking
+      if (shouldLike) {
+        comment.is_liked_by_user = false;
+        comment.likes_count = Math.max((comment.likes_count ?? 0) - 1, 0);
+      }
+
+      // Set the new dislike status
+      comment.is_disliked_by_user = shouldDislike;
     }
   }
 
-  function updateComment(updates: Partial<PostComment>) {
-    if (updates.post_id && updates.id) {
-      if (comments.value[updates.post_id][updates.id]) {
-        const comment = getComment(updates.post_id, updates.id);
-        comments.value[updates.post_id][updates.id] = {
-          ...comment,
-          ...updates,
+  function updateComment(data: { updates: Partial<PostComment> }) {
+    if (data.updates.post_id && data.updates.id) {
+      const existingComment =
+        comments.value[data.updates.post_id][data.updates.id];
+      if (existingComment) {
+        comments.value[data.updates.post_id][data.updates.id] = {
+          ...existingComment,
+          ...data.updates,
         };
       } else {
         console.warn("Comment to update is not found");
@@ -154,7 +208,7 @@ const useCommentStore = defineStore("comments", () => {
         addNewCommentsFromSocket(e.comment);
       })
       .listen("CommentUpdated", (e: { updates: Partial<PostComment> }) => {
-        updateComment(e.updates);
+        updateComment(e);
       });
   }
 
@@ -170,7 +224,6 @@ const useCommentStore = defineStore("comments", () => {
         parentComment.replies.length > 0
       ) {
         addComment(comment, comment.post_id);
-        console.log("Comment added");
       }
     }
   }
@@ -193,8 +246,9 @@ const useCommentStore = defineStore("comments", () => {
     stopListeningForComments,
     clearComments,
     getComment,
-    nestedLimit,
     toggleReaction,
+    repliesLimit,
+    initializeRouteLimit,
     updateComment,
   };
 });

@@ -1,13 +1,14 @@
 import api from "@/config/api.config";
 
 export default class AuthUtils {
-  static async login(email: string, password: string) {
+  static async login(credentials: {
+    email?: string;
+    username?: string;
+    password: string;
+  }) {
     await csrf();
     try {
-      const response = await api.post("auth/login", {
-        email,
-        password,
-      });
+      const response = await api.post("auth/login", { ...credentials });
       return response;
     } catch (error) {
       throw error;
