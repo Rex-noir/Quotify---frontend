@@ -14,7 +14,7 @@ const userStore = useUserStore();
       </div>
       <div
         v-ripple
-        class="prose w-full rounded-2xl bg-[#e0dfdf] p-2 transition-all dark:prose-invert hover:bg-[#e9e7e7] dark:bg-[#262626] dark:hover:bg-[#3d3d3d]"
+        class="prose w-full max-w-none rounded-2xl bg-[#dad9d9] p-2 transition-all dark:prose-invert hover:bg-[#e9e7e7] dark:bg-[#262626] dark:hover:bg-[#3d3d3d]"
       >
         Quote a quote ?
       </div>
