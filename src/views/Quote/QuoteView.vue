@@ -74,7 +74,6 @@ watch(post, async (newPost) => {
 
 watch(route, (newRoute) => {
   window.scrollTo(0, 0);
-  window.scrollTo(0, 0);
 });
 
 onMounted(async () => {

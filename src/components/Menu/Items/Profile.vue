@@ -5,16 +5,16 @@ const userStore = useUserStore();
 </script>
 <template>
   <div v-ripple>
-    <div class="flex justify-center" >
+    <div class="flex justify-center">
       <Avatar
         shape="circle"
         :size="'small'"
         :label="userStore.userInfo?.name[0]"
       />
     </div>
-    <div class="prose flex flex-col leading-tight dark:prose-invert">
-      <span class="font-bold">{{ userStore.userInfo?.name }}</span>
-      <span class="text-sm">View your profile</span>
+    <div class="prose flex flex-col leading-[1.1] dark:prose-invert">
+      <span class="m-0 p-0 font-bold">{{ userStore.userInfo?.name }}</span>
+      <span class="m-0 p-0 text-sm">@{{ userStore.userInfo?.username }}</span>
     </div>
   </div>
 </template>
