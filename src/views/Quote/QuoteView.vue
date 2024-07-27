@@ -142,12 +142,16 @@ const topLevelComments = computed(() => {
       </div>
     </div>
   </div>
-  <div class="sticky bottom-[1px] z-10 h-fit">
-    <CommentEditor v-if="post" :post-id="post.id"></CommentEditor>
+  <div class="comment-box-container sticky bottom-[0px] z-10 h-fit lg:bottom-2">
+    <CommentEditor
+      v-if="post"
+      :key="post.id"
+      :post-id="post.id"
+    ></CommentEditor>
   </div>
 </template>
 <style>
 .p-scrolltop {
-  @apply prose max-w-none dark:prose-invert text-white dark:hover:border-none dark:hover:bg-slate-700;
+  @apply prose max-w-none text-white dark:prose-invert dark:hover:border-none dark:hover:bg-slate-700;
 }
 </style>
