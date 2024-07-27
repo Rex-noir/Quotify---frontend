@@ -1,65 +1,71 @@
-export default class CursorUtils {
-  private element: HTMLDivElement;
-  private static markerTextChar = "\ufeff"; // Character used for marker text
-
-  constructor(element: HTMLDivElement) {
-    this.element = element;
-  }
-
-  // Method to save the cursor position within the element
-  saveCursorPosition(): number {
+export function cursorUtils() {
+  function getCaretPosition(element: HTMLElement): number {
     const selection = window.getSelection();
-    const range = selection?.getRangeAt(0);
-    const markerTextNode = document.createTextNode(CursorUtils.markerTextChar);
-
-    if (range) {
-      // Insert marker text node at the current cursor position
-      range.insertNode(markerTextNode);
-
-      // Return the position of the marker text
-      return this.element.textContent?.indexOf(CursorUtils.markerTextChar) ?? 0;
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      const preCaretRange = range.cloneRange();
+      preCaretRange.selectNodeContents(element);
+      preCaretRange.setEnd(range.endContainer, range.endOffset);
+      return preCaretRange.toString().length;
     }
     return 0;
   }
 
-  // Method to restore the cursor position within the element
-  restoreCursorPosition(cursorPosition: number): void {
-    // Remove marker text node
-    this.element.innerHTML = this.element.innerHTML.replace(
-      CursorUtils.markerTextChar,
-      "",
-    );
+  // Helper function to set caret position
+  function setCaretPosition(element: HTMLElement, position: number) {
+    const range = document.createRange();
+    const sel = window.getSelection();
 
-    // Create a new range and set the cursor position
-    const newRange = document.createRange();
-    let charCount = 0;
+    let currentNode: Node | null = element;
+    let currentOffset = 0;
 
-    function setCursor(node: Node): boolean {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const textContent = node.textContent;
-        if (textContent !== null) {
-          if (charCount + textContent.length >= cursorPosition) {
-            newRange.setStart(node, cursorPosition - charCount);
-            newRange.setEnd(node, cursorPosition - charCount);
-            return true;
-          } else {
-            charCount += textContent.length;
-          }
-        }
-      } else {
-        for (let child of Array.from(node.childNodes)) {
-          if (setCursor(child)) {
-            return true;
-          }
+    // Traverse the node tree to find the correct position
+    while (currentNode) {
+      if (currentNode.nodeType === Node.TEXT_NODE) {
+        const textLength = (currentNode as Text).length;
+        if (currentOffset + textLength >= position) {
+          range.setStart(currentNode, position - currentOffset);
+          range.collapse(true);
+          sel?.removeAllRanges();
+          sel?.addRange(range);
+          return;
+        } else {
+          currentOffset += textLength;
         }
       }
-      return false;
+      currentNode = getNextNode(currentNode, element);
     }
-
-    setCursor(this.element);
-
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(newRange);
   }
+
+  function setEndOfContenteditable(contentEditableElement: HTMLElement) {
+    let range, selection;
+    selection = window.getSelection(); //get the selection object (allows you to change selection)
+
+    if (document.createRange && selection) {
+      //Firefox, Chrome, Opera, Safari, IE 9+
+      range = document.createRange(); //Create a range (a range is a like the selection but invisible)
+      range.selectNodeContents(contentEditableElement); //Select the entire contents of the element with the range
+      range.collapse(false); //collapse the range to the end point. false means collapse to end rather than the start
+      selection.removeAllRanges(); //remove any selections already made
+      selection.addRange(range); //make the range you have just created the visible selection
+    }
+  }
+
+  function getNextNode(node: Node, root: Node): Node | null {
+    if (node.firstChild) {
+      return node.firstChild;
+    }
+    while (node) {
+      if (node.nextSibling) {
+        return node.nextSibling;
+      }
+      if (node === root) {
+        return null;
+      }
+      node = node.parentNode!;
+    }
+    return null;
+  }
+
+  return { getCaretPosition, setCaretPosition, setEndOfContenteditable };
 }

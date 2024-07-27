@@ -77,16 +77,10 @@ const handleLoadingMore = async () => {
 const commentAdded = ref(false);
 
 const formattedComment = computed(() => {
-  const mentionRegex = new RegExp(`@(${props.parentUser?.name})`, "g");
-  const formattedText = formatTextWithMentions(
-    comment.value.content,
-    mentionRegex,
-  );
-  return formattedText;
+  return formatTextWithMentions(props.comment.content, props.comment.mentions);
 });
 
 const filteredReplies = computed(() => {
-  // On other routes, filter replies based on their level and the nested limit
   return comment.value.replies?.filter(
     (reply) => reply.level <= commentStore.repliesLimit[route.fullPath],
   );
@@ -159,7 +153,7 @@ const filteredReplies = computed(() => {
           >
             <span
               v-html="formattedComment"
-              class="break-all px-2 leading-tight"
+              class="break-all px-2 text-justify"
             ></span>
           </div>
 
@@ -189,6 +183,7 @@ const filteredReplies = computed(() => {
         <div v-if="showReplyEditor" class="col-start-2 p-3">
           <CommentEditor
             @success="commentAdded = true"
+            :key="comment.id"
             :post-id="comment.post_id"
             :parent-comment="comment"
           />

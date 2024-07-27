@@ -54,10 +54,16 @@ export interface PostComment {
   level: number;
   replies: PostComment[] | null;
   is_liked_by_user?: boolean;
+  mentions: Mention[];
   is_disliked_by_user?: boolean;
 }
 
 export enum Reactions {
   LIKE = "like",
   DISLIKE = "dislike",
+}
+
+export interface Mention {
+  username: string;
+  user_id: number;
 }
