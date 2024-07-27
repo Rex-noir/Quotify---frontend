@@ -1,5 +1,10 @@
 import api from "@/config/api.config";
-import type { Post, PostComment, Reactions } from "@/types/Post/post.types";
+import type {
+  Mention,
+  Post,
+  PostComment,
+  Reactions,
+} from "@/types/Post/post.types";
 import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
 
 export default class PostUtils {
@@ -45,15 +50,12 @@ export default class PostUtils {
 
   static async postComment(data: {
     content: string;
-    postId: number;
-    parentId?: number;
+    post_id: number;
+    parent_id?: number;
+    mentions?: Mention[];
   }) {
     try {
-      const response = await api.post("/comments", {
-        content: data.content,
-        post_id: data.postId,
-        parent_id: data.parentId,
-      });
+      const response = await api.post("/comments", { ...data });
       return response;
     } catch (error) {
       throw error;
