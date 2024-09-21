@@ -1,19 +1,20 @@
 import Echo from "laravel-echo";
-
 import Pusher from "pusher-js";
 import api from "./api.config";
 
 window.Pusher = Pusher;
 
+const isProd = import.meta.env.VITE_ENV === 'production';
+
 window.Echo = new Echo({
   broadcaster: "reverb",
-  key: import.meta.env.VITE_REVERB_APP_KEY,
-  wsHost: import.meta.env.VITE_REVERB_HOST,
-  wsPort: import.meta.env.VITE_REVERB_PORT,
-  wssPort: import.meta.env.VITE_REVERB_PORT,
-  forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https",
+  key: isProd ? import.meta.env.VITE_REVERB_APP_KEY_PROD : import.meta.env.VITE_REVERB_APP_KEY_DEV,
+  wsHost: isProd ? import.meta.env.VITE_REVERB_HOST_PROD : import.meta.env.VITE_REVERB_HOST_DEV,
+  wsPort: isProd ? import.meta.env.VITE_REVERB_PORT_PROD : import.meta.env.VITE_REVERB_PORT_DEV,
+  wssPort: isProd ? import.meta.env.VITE_REVERB_PORT_PROD : import.meta.env.VITE_REVERB_PORT_DEV,
+  forceTLS: isProd ? (import.meta.env.VITE_REVERB_SCHEME_PROD === "https") : (import.meta.env.VITE_REVERB_SCHEME_DEV === "https"),
   enabledTransports: ["ws", "wss"],
-  authEndpoint: `${import.meta.env.VITE_API_URL}/broadcasting/auth`, // Updated API endpoint
+  authEndpoint: `${isProd ? import.meta.env.VITE_API_URL : import.meta.env.VITE_API_DEV}/broadcasting/auth`,
 
   authorizer: (channel, options) => {
     return {
