@@ -1,0 +1,92 @@
+<script setup lang="ts">
+import Panel from "primevue/panel";
+import { ref } from "vue";
+import Skeleton from "primevue/skeleton";
+import PostActionBarSkeleton from "./PostActionBarSkeleton.vue";
+import { useRouter } from "vue-router";
+import Button from "primevue/button";
+
+const router = useRouter();
+let collapsed = ref(false);
+const handleBackClick = () => {
+  router.go(-1);
+};
+</script>
+<template>
+  <div>
+    <div class="w-full">
+      <Panel
+        toggleable
+        class="mb-1 border-b border-t bg-surface-100 shadow-lg dark:border-surface-800 dark:bg-inherit"
+      >
+        <template #toggleicon>
+          <span
+            v-if="collapsed"
+            @click="collapsed = !collapsed"
+            class="pi pi-chevron-down"
+          ></span>
+          <span
+            v-else
+            @click="collapsed = !collapsed"
+            class="pi pi-chevron-up"
+          ></span>
+        </template>
+        <template #header>
+          <div>
+            <div class="mb-1 flex h-full items-center gap-1">
+              <div v-if="$route.name !== 'home'">
+                <Button
+                  icon="pi pi-arrow-left"
+                  @click="handleBackClick"
+                  class="prose border-none bg-inherit dark:prose-invert"
+                />
+              </div>
+              <Skeleton class="mb-2 rounded-full p-4" width="30px"></Skeleton>
+              <div class="flex flex-col gap-1">
+                <Skeleton width="10rem"></Skeleton>
+                <span class="prose prose-sm dark:prose-invert">
+                  <Skeleton width="100px"></Skeleton>
+                </span>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template #footer>
+          <PostActionBarSkeleton></PostActionBarSkeleton>
+        </template>
+
+        <div class="mt-1 flex flex-col gap-5">
+          <Skeleton width="14rem"></Skeleton>
+
+          <div class="mt-2 flex flex-col gap-6 text-center leading-normal">
+            <div
+              class="grid grid-rows-[5fr,1fr] place-items-center gap-1 md:grid-rows-[10fr,1fr]"
+            >
+              <Skeleton width="15rem"> </Skeleton>
+              <Skeleton width="10rem"> </Skeleton>
+              <Skeleton width="13rem"> </Skeleton>
+            </div>
+            <Skeleton class="mr-3 self-end" width="5rem"></Skeleton>
+          </div>
+        </div>
+      </Panel>
+    </div>
+  </div>
+</template>
+
+<style>
+.p-panel-header {
+  padding: 5px;
+  @apply border-b;
+}
+.p-panel-content {
+  padding: 5px;
+}
+.p-panel {
+  padding: 0px;
+}
+.p-panel-footer {
+  padding: 0px;
+}
+</style>
