@@ -59,7 +59,7 @@ const handleClick = async (action: CommentBarActions) => {
 
 const debounceReact = debounce(async (reaction: Reactions) => {
   await PostUtils.reactComment(props.comment.id, reaction);
-}, 2000);
+}, 0);
 </script>
 <template>
   <div

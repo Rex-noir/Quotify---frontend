@@ -70,6 +70,11 @@ const useCommentStore = defineStore("comments", () => {
       comments.value[postId] = {};
     }
 
+    comments.value[postId] = {
+      ...comments.value[postId],
+      [newComment.id]: newComment,
+    };
+
     if (!comments.value[postId][newComment.id]) {
       newComment.level = newComment.level ?? 0; // default level to 0 if not provided
       comments.value[postId][newComment.id] = newComment;
@@ -92,7 +97,9 @@ const useCommentStore = defineStore("comments", () => {
         parentComment.replies = parentComment.replies || [];
         if (!parentComment.replies.some((r) => r.id === newComment.id)) {
           newComment.level = (parentComment.level || 0) + 1;
-          parentComment.replies.push(newComment);
+
+          // Use Vue's reactivity system for nested updates
+          parentComment.replies = [...parentComment.replies, newComment];
           parentComment.replies_count = parentComment.replies.length;
 
           if (newComment.level > repliesLimit.value[route.fullPath]) {

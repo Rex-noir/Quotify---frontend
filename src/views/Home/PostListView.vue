@@ -7,7 +7,6 @@ import PostUtils from "@/utils/post.utils";
 import CardPostSkeleton from "@/components/Posts/CardPostSkeleton.vue";
 import type { PaginatedResponse } from "@/types/Response/apiresponses.types";
 import usePostStore from "@/stores/posts.store";
-import ModalQuoteView from "@/views/Quote/ModalQuoteView.vue";
 import useLayoutStore from "@/stores/layouts.store";
 import CreatePost from "@/components/Posts/CreatePost.vue";
 import useUserStore from "@/stores/user.store";

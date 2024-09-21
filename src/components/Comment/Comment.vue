@@ -216,11 +216,11 @@ const filteredReplies = computed(() => {
   /* @apply after:absolute after:left-4 after:top-16 after:h-full after:w-4 after:rounded-b-md after:border-b after:border-l; */
 }
 .line-blend {
-  @apply after:absolute after:top-[115px] after:h-2 after:w-[15px] after:rounded-bl-lg after:border-b after:border-l;
+  @apply after:absolute after:top-[125px] after:h-2 after:w-[15px] after:rounded-bl-lg after:border-b after:border-l;
 }
 
 .replies-line-connect {
   @apply before:pointer-events-none; /* Add this line */
-  @apply after:absolute after:top-[100px] after:h-2 after:w-[15px] after:rounded-bl-lg after:border-b after:border-l;
+  @apply after:absolute after:top-[110px] after:h-2 after:w-[15px] after:rounded-bl-lg after:border-b after:border-l;
 }
 </style>

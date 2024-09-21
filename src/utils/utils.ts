@@ -4,7 +4,7 @@ export function debounce<T extends (...args: any[]) => void>(
   func: T,
   delay: number,
 ): (...args: Parameters<T>) => void {
-  let timeoutId: NodeJS.Timeout;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
   return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
     const context = this;
@@ -18,8 +18,12 @@ export function debounce<T extends (...args: any[]) => void>(
 
 export function formatTextWithMentions(
   text: string,
-  mentions: Mention[],
+  mentions: Mention[] | undefined,
 ): string {
+  if (!mentions || mentions.length === 0) {
+    return text;
+  }
+
   mentions.forEach((mention) => {
     const mentionRegex = new RegExp(`@${mention.username}`, "g");
     text = text.replace(

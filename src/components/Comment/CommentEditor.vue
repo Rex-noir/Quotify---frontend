@@ -157,44 +157,7 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 };
 
-function positionSuggestionBox() {
-  const selection = window.getSelection();
-  if (suggestionBox.value && selection && selection.rangeCount > 0) {
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-
-    const stickyContainer = document.querySelector("div.comment-box-container");
-
-    if (suggestionBox.value.style.display !== "none") {
-      return;
-    }
-
-    if (stickyContainer) {
-      const stickyContainerRect = stickyContainer.getBoundingClientRect();
-      let leftOffset = rect.left - stickyContainerRect.left;
-
-      // Get the width of the suggestion box
-      const suggestionBoxWidth = suggestionBox.value.offsetWidth;
-
-      // Check if the suggestion box would overflow on the right
-      const rightEdge = leftOffset + suggestionBoxWidth;
-      const containerWidth = stickyContainer.clientWidth;
-
-      if (rightEdge > containerWidth) {
-        // If it would overflow, adjust the left offset
-        leftOffset = Math.max(0, containerWidth - suggestionBoxWidth);
-      }
-
-      // Apply the position
-      suggestionBox.value.style.left = `${leftOffset + window.scrollX}px`;
-
-      // Ensure the suggestion box doesn't go off the left edge
-      if (leftOffset < 0) {
-        suggestionBox.value.style.left = `${window.scrollX}px`;
-      }
-    }
-  }
-}
+function positionSuggestionBox() {}
 
 const initializeContent = () => {
   if (props.parentComment && props.parentComment.user) {
@@ -230,9 +193,25 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <div
-    class="prose relative flex h-full max-w-none flex-col gap-2 dark:prose-invert"
-  >
+  <div class="prose flex h-full max-w-none flex-col gap-2 dark:prose-invert">
+    <div
+      ref="suggestionBox"
+      v-show="showSuggestion"
+      class="absolute z-50 w-full rounded-md bg-[#b3adb6] dark:bg-[#3c3c3c]"
+    >
+      <ul class="m-0 w-full list-none p-0">
+        <li
+          class="m-0 p-0"
+          @click="handleClickMentions(user)"
+          v-for="user in users"
+        >
+          <Profile
+            class="grid cursor-pointer grid-cols-[40px,1fr] place-items-start items-center p-2 px-2 hover:bg-slate-200 dark:hover:bg-[#b1a1a144]"
+            :user="user"
+          />
+        </li>
+      </ul>
+    </div>
     <div class="relative flex w-full flex-grow items-center gap-1 shadow-md">
       <div
         v-focus
@@ -251,24 +230,6 @@ onBeforeUnmount(() => {
         class="pi pi-send absolute right-2 h-fit cursor-pointer rounded-full border-none p-2 text-xl hover:text-slate-500 active:text-slate-900 dark:hover:text-blue-500 dark:active:text-green-300"
       ></span>
       <Spinner v-else class="absolute right-4" color="teal"></Spinner>
-    </div>
-    <div
-      ref="suggestionBox"
-      v-show="showSuggestion"
-      class="absolute bottom-14 z-50 w-56 rounded-md bg-[#b3adb6] dark:bg-[#3c3c3c]"
-    >
-      <ul class="m-0 w-full list-none p-0">
-        <li
-          class="m-0 p-0"
-          @click="handleClickMentions(user)"
-          v-for="user in users"
-        >
-          <Profile
-            class="grid cursor-pointer grid-cols-[40px,1fr] place-items-start items-center p-2 px-2 hover:bg-slate-200 dark:hover:bg-[#b1a1a144]"
-            :user="user"
-          />
-        </li>
-      </ul>
     </div>
   </div>
 </template>
